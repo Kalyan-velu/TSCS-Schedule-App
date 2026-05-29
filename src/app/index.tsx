@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
-import {ActivityIndicator, ScrollView, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View, Linking} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import * as WebBrowser from 'expo-web-browser';
 
 import {ThemedText} from '@/components/themed-text';
 import {ThemedView} from '@/components/themed-view';
@@ -15,6 +16,8 @@ type ClassItem = {
   startTime: string;
   endTime: string;
   color: string;
+  startDate: Date;
+  endDate: Date;
 };
 
 const EVENT_COLORS = ['#3c87f7', '#AF52DE', '#34C759', '#FF9500', '#FF3B30', '#FF2D55'];
@@ -38,6 +41,8 @@ function toClassItem(event: ApiEvent): ClassItem {
     startTime: fmt(start),
     endTime: fmt(end),
     color: colorForTitle(event.title),
+    startDate: start,
+    endDate: end,
   };
 }
 
@@ -58,16 +63,57 @@ function getGreeting() {
   return 'Good Evening';
 }
 
-function getNextClass(classes: ClassItem[]): ClassItem | null {
-  const now = new Date();
-  const current = now.getHours() * 60 + now.getMinutes();
-  return (
-    classes.find((cls) => {
-      const [h, m] = cls.startTime.split(':').map(Number);
-      return h * 60 + m > current;
-    }) ?? null
-  );
+function getWeekRange() {
+  const today = new Date();
+  const day = today.getDay();
+  const diffToMon = day === 0 ? -6 : 1 - day;
+  const mon = new Date(today);
+  mon.setDate(today.getDate() + diffToMon);
+  mon.setHours(0, 0, 0, 0);
+  const sun = new Date(mon);
+  sun.setDate(mon.getDate() + 6);
+  sun.setHours(23, 59, 59, 999);
+  return { from: mon.toISOString(), to: sun.toISOString() };
 }
+
+const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
+type Weekday = (typeof WEEKDAYS)[number];
+const WEEKDAY_BY_INDEX: Record<number, Weekday> = {
+  1: 'Monday',
+  2: 'Tuesday',
+  3: 'Wednesday',
+  4: 'Thursday',
+  5: 'Friday',
+  6: 'Saturday',
+  0: 'Sunday',
+};
+
+function getOngoingAndNextClass(classes: ClassItem[]) {
+  const now = new Date();
+  
+  // Sort classes by start time to make sure they are in chronological order
+  const sorted = [...classes].sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+  
+  const ongoing = sorted.find((cls) => now >= cls.startDate && now <= cls.endDate);
+  if (ongoing) {
+    return { current: ongoing, isOngoing: true };
+  }
+  
+  const next = sorted.find((cls) => cls.startDate > now);
+  return { current: next ?? null, isOngoing: false };
+}
+
+const handleJoinMeeting = async (url: string) => {
+  try {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      await WebBrowser.openBrowserAsync(url);
+    } else {
+      await Linking.openURL(url);
+    }
+  } catch (error) {
+    console.error('Failed to open meeting link:', error);
+  }
+};
 
 export default function HomeScreen() {
   const [classes, setClasses] = useState<ClassItem[]>([]);
@@ -75,12 +121,9 @@ export default function HomeScreen() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const from = new Date();
-    from.setHours(0, 0, 0, 0);
-    const to = new Date();
-    to.setHours(23, 59, 59, 999);
+    const { from, to } = getWeekRange();
 
-    fetchEvents()
+    fetchEvents({ from, to })
       .then((events) => {
         const sorted = [...events].sort(
           (a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime(),
@@ -94,12 +137,24 @@ export default function HomeScreen() {
       });
   }, []);
 
-  const nextClass = getNextClass(classes);
+  const { current: highlightClass, isOngoing } = getOngoingAndNextClass(classes);
   const today = new Date().toLocaleDateString('en-IN', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
   });
+
+  // Group classes by weekday
+  const groupedClasses: Partial<Record<Weekday, ClassItem[]>> = {};
+  for (const cls of classes) {
+    const dayName = WEEKDAY_BY_INDEX[cls.startDate.getDay()];
+    if (dayName) {
+      if (!groupedClasses[dayName]) {
+        groupedClasses[dayName] = [];
+      }
+      groupedClasses[dayName]!.push(cls);
+    }
+  }
 
   return (
     <ThemedView style={styles.container}>
@@ -121,30 +176,44 @@ export default function HomeScreen() {
             <ThemedView type="backgroundElement" style={styles.noClassCard}>
               <ThemedText type="default" themeColor="textSecondary">Could not load schedule</ThemedText>
             </ThemedView>
-          ) : nextClass ? (
-            <ThemedView type="backgroundElement" style={styles.nextCard}>
-              <View style={styles.nextCardHeader}>
-                <ThemedText type="small" themeColor="textSecondary">NEXT CLASS</ThemedText>
-                <View style={styles.liveDot} />
+          ) : highlightClass ? (
+            <ThemedView type="backgroundElement" style={styles.highlightCard}>
+              <View style={styles.highlightCardHeader}>
+                <View style={styles.headerLabelContainer}>
+                  <ThemedText type="smallBold" style={{ color: isOngoing ? '#FF3B30' : '#3c87f7' }}>
+                    {isOngoing ? 'LIVE NOW' : 'NEXT CLASS'}
+                  </ThemedText>
+                  <View style={[styles.liveDot, { backgroundColor: isOngoing ? '#FF3B30' : '#3c87f7' }]} />
+                </View>
               </View>
-              <View style={[styles.nextCardAccent, { backgroundColor: nextClass.color }]} />
-              <ThemedText type="subtitle" style={styles.nextSubject}>{nextClass.subject}</ThemedText>
-              {!!nextClass.description && (
-                <ThemedText type="small" themeColor="textSecondary">{nextClass.description}</ThemedText>
+              <View style={[styles.highlightCardAccent, { backgroundColor: highlightClass.color }]} />
+              <ThemedText type="subtitle" style={styles.highlightSubject}>{highlightClass.subject}</ThemedText>
+              {!!highlightClass.description && (
+                <ThemedText type="small" themeColor="textSecondary">{highlightClass.description}</ThemedText>
               )}
-              <View style={[styles.nextTimePill, { backgroundColor: nextClass.color + '20' }]}>
-                <ThemedText type="smallBold" style={{ color: nextClass.color }}>
-                  {formatTime(nextClass.startTime)} – {formatTime(nextClass.endTime)}
-                </ThemedText>
+              <View style={styles.highlightMetaRow}>
+                <View style={[styles.highlightTimePill, { backgroundColor: highlightClass.color + '20' }]}>
+                  <ThemedText type="smallBold" style={{ color: highlightClass.color }}>
+                    {formatTime(highlightClass.startTime)} – {formatTime(highlightClass.endTime)}
+                  </ThemedText>
+                </View>
+                {highlightClass.meetLink && (
+                  <TouchableOpacity
+                    style={[styles.joinBtn, { backgroundColor: '#3c87f7' }]}
+                    onPress={() => handleJoinMeeting(highlightClass.meetLink!)}
+                    activeOpacity={0.8}>
+                    <ThemedText type="smallBold" style={styles.joinBtnText}>Join Meeting</ThemedText>
+                  </TouchableOpacity>
+                )}
               </View>
             </ThemedView>
           ) : (
             <ThemedView type="backgroundElement" style={styles.noClassCard}>
-              <ThemedText type="default" themeColor="textSecondary">No more classes today</ThemedText>
+              <ThemedText type="default" themeColor="textSecondary">No upcoming classes scheduled</ThemedText>
             </ThemedView>
           )}
 
-          <ThemedText type="smallBold" style={styles.sectionTitle}>Today's Classes</ThemedText>
+          <ThemedText type="smallBold" style={styles.sectionTitle}>Weekly Schedule</ThemedText>
 
           {loading ? (
             <View style={styles.loadingInline}>
@@ -156,25 +225,72 @@ export default function HomeScreen() {
             </ThemedView>
           ) : classes.length === 0 ? (
             <ThemedView type="backgroundElement" style={styles.noClassCard}>
-              <ThemedText type="default" themeColor="textSecondary">No classes scheduled for today</ThemedText>
+              <ThemedText type="default" themeColor="textSecondary">No classes scheduled for this week</ThemedText>
             </ThemedView>
           ) : (
-            <View style={styles.timeline}>
-              {classes.map((cls, i) => (
-                <View key={cls.id} style={styles.timelineRow}>
-                  <View style={styles.timelineLeft}>
-                    <View style={[styles.timelineDot, { backgroundColor: cls.color }]} />
-                    {i < classes.length - 1 && <View style={styles.timelineLine} />}
-                  </View>
-                  <ThemedView type="backgroundElement" style={styles.timelineCard}>
-                    <ThemedText type="smallBold">{cls.subject}</ThemedText>
-                    <ThemedText type="small" themeColor="textSecondary">
-                      {formatTime(cls.startTime)} – {formatTime(cls.endTime)}
-                      {cls.description ? `  ·  ${cls.description}` : ''}
+            <View style={styles.scheduleList}>
+              {WEEKDAYS.map((day) => {
+                const dayClasses = groupedClasses[day] ?? [];
+                
+                // Show weekend days (Sat/Sun) only if they have classes
+                const isWeekend = day === 'Saturday' || day === 'Sunday';
+                if (isWeekend && dayClasses.length === 0) return null;
+                
+                return (
+                  <View key={day} style={styles.daySection}>
+                    <ThemedText type="smallBold" style={styles.dayHeader}>
+                      {day}
                     </ThemedText>
-                  </ThemedView>
-                </View>
-              ))}
+                    {dayClasses.length === 0 ? (
+                      <ThemedView type="backgroundElement" style={styles.emptyDayCard}>
+                        <ThemedText type="small" themeColor="textSecondary">
+                          No classes scheduled
+                        </ThemedText>
+                      </ThemedView>
+                    ) : (
+                      <View style={styles.dayClasses}>
+                        {dayClasses.map((cls) => (
+                          <ThemedView key={cls.id} type="backgroundElement" style={styles.classCard}>
+                            <View style={[styles.classColorBar, { backgroundColor: cls.color }]} />
+                            <View style={styles.classCardBody}>
+                              <View style={styles.classCardHeader}>
+                                <ThemedText type="smallBold" style={styles.classSubject}>
+                                  {cls.subject}
+                                </ThemedText>
+                                <View style={[styles.classTimePill, { backgroundColor: cls.color + '15' }]}>
+                                  <ThemedText type="small" style={{ color: cls.color, fontWeight: '600', fontSize: 12 }}>
+                                    {formatTime(cls.startTime)}
+                                  </ThemedText>
+                                </View>
+                              </View>
+                              {!!cls.description && (
+                                <ThemedText type="small" themeColor="textSecondary">
+                                  {cls.description}
+                                </ThemedText>
+                              )}
+                              <View style={styles.classCardMeta}>
+                                <ThemedText type="small" themeColor="textSecondary">
+                                  {formatTime(cls.startTime)} – {formatTime(cls.endTime)}
+                                </ThemedText>
+                                {cls.meetLink && (
+                                  <TouchableOpacity
+                                    style={[styles.classJoinBtn, { backgroundColor: '#3c87f7' }]}
+                                    onPress={() => handleJoinMeeting(cls.meetLink!)}
+                                    activeOpacity={0.8}>
+                                    <ThemedText type="smallBold" style={styles.classJoinBtnText}>
+                                      Join Meeting
+                                    </ThemedText>
+                                  </TouchableOpacity>
+                                )}
+                              </View>
+                            </View>
+                          </ThemedView>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
             </View>
           )}
 
@@ -206,15 +322,16 @@ const styles = StyleSheet.create({
   header: { gap: Spacing.half, paddingBottom: Spacing.one },
   loadingCard: { borderRadius: Spacing.four, padding: Spacing.four, alignItems: 'center' },
   loadingInline: { padding: Spacing.three, alignItems: 'center' },
-  nextCard: {
+  highlightCard: {
     borderRadius: Spacing.four,
     padding: Spacing.four,
     gap: Spacing.two,
     overflow: 'hidden',
   },
-  nextCardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#34C759' },
-  nextCardAccent: {
+  highlightCardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerLabelContainer: { flexDirection: 'row', alignItems: 'center', gap: Spacing.one },
+  liveDot: { width: 8, height: 8, borderRadius: 4 },
+  highlightCardAccent: {
     position: 'absolute',
     top: -20,
     right: -20,
@@ -223,27 +340,100 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     opacity: 0.08,
   },
-  nextSubject: { lineHeight: 38 },
-  nextTimePill: {
-    alignSelf: 'flex-start',
+  highlightSubject: { lineHeight: 38 },
+  highlightMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: Spacing.one,
+  },
+  highlightTimePill: {
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.one,
     borderRadius: Spacing.two,
-    marginTop: Spacing.one,
+  },
+  joinBtn: {
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.one + 2,
+    borderRadius: Spacing.two,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  joinBtnText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '600',
   },
   noClassCard: { borderRadius: Spacing.four, padding: Spacing.four, alignItems: 'center' },
   sectionTitle: { marginTop: Spacing.one },
-  timeline: { gap: 0 },
-  timelineRow: { flexDirection: 'row', gap: Spacing.two },
-  timelineLeft: { alignItems: 'center', paddingTop: Spacing.three + 3 },
-  timelineDot: { width: 10, height: 10, borderRadius: 5 },
-  timelineLine: { width: 2, flex: 1, backgroundColor: '#00000018', marginVertical: Spacing.half },
-  timelineCard: {
-    flex: 1,
+  scheduleList: { gap: Spacing.one },
+  daySection: {
+    marginBottom: Spacing.two,
+    gap: Spacing.two,
+  },
+  dayHeader: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginTop: Spacing.two,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    opacity: 0.8,
+  },
+  emptyDayCard: {
     borderRadius: Spacing.two,
     padding: Spacing.three,
-    marginBottom: Spacing.two,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dayClasses: {
+    gap: Spacing.two,
+  },
+  classCard: {
+    flexDirection: 'row',
+    borderRadius: Spacing.three,
+    overflow: 'hidden',
+  },
+  classColorBar: {
+    width: 4,
+  },
+  classCardBody: {
+    flex: 1,
+    padding: Spacing.three,
     gap: Spacing.half,
+  },
+  classCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  classSubject: {
+    fontSize: 15,
+    fontWeight: '600',
+    flex: 1,
+    marginRight: Spacing.two,
+  },
+  classTimePill: {
+    paddingHorizontal: Spacing.two,
+    paddingVertical: 2,
+    borderRadius: Spacing.two,
+  },
+  classCardMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: Spacing.one,
+  },
+  classJoinBtn: {
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.one,
+    borderRadius: Spacing.two,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  classJoinBtnText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   notifList: { gap: Spacing.two },
   notifRow: {

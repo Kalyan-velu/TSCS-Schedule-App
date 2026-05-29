@@ -47,7 +47,7 @@ export function fetchEvents(params?: { batchId?: string; from?: string; to?: str
   if (params?.from) q.set('from', params.from);
   if (params?.to) q.set('to', params.to);
   const qs = q.toString();
-  return apiFetch<Event[]>(`/event`);
+  return apiFetch<Event[]>(qs ? `/event?${qs}` : `/event`);
 }
 
 export function fetchEvent(eventId: string): Promise<Event> {

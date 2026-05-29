@@ -1,12 +1,25 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as WebBrowser from 'expo-web-browser';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { fetchEvents, type Event as ApiEvent } from '@/lib/api';
+
+const handleJoinMeeting = async (url: string) => {
+  try {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      await WebBrowser.openBrowserAsync(url);
+    } else {
+      await Linking.openURL(url);
+    }
+  } catch (error) {
+    console.error('Failed to open meeting link:', error);
+  }
+};
 
 type ClassItem = {
   id: string;
@@ -169,14 +182,19 @@ export default function ScheduleScreen() {
                     <ThemedText type="small" themeColor="textSecondary">{cls.description}</ThemedText>
                   )}
                   <View style={styles.cardMeta}>
-                    {cls.meetLink ? (
-                      <ThemedText type="small" themeColor="textSecondary">Online</ThemedText>
-                    ) : (
-                      <View />
-                    )}
                     <ThemedText type="small" themeColor="textSecondary">
                       {formatTime(cls.startTime)} – {formatTime(cls.endTime)}
                     </ThemedText>
+                    {cls.meetLink && (
+                      <TouchableOpacity
+                        style={[styles.joinBtn, { backgroundColor: '#3c87f7' }]}
+                        onPress={() => handleJoinMeeting(cls.meetLink!)}
+                        activeOpacity={0.8}>
+                        <ThemedText type="smallBold" style={styles.joinBtnText}>
+                          Join Meeting
+                        </ThemedText>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </View>
               </ThemedView>
@@ -224,5 +242,17 @@ const styles = StyleSheet.create({
   subjectText: { flex: 1, marginRight: Spacing.two },
   timePill: { paddingHorizontal: Spacing.two, paddingVertical: 3, borderRadius: Spacing.two },
   timeText: { fontSize: 12, fontWeight: '600' },
-  cardMeta: { flexDirection: 'row', justifyContent: 'space-between', marginTop: Spacing.one },
+  cardMeta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: Spacing.one },
+  joinBtn: {
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.one,
+    borderRadius: Spacing.two,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  joinBtnText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
 });
