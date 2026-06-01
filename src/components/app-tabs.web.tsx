@@ -6,7 +6,7 @@ import {
   TabTriggerSlotProps,
   TabListProps,
 } from 'expo-router/ui';
-import { SymbolView } from 'expo-symbols';
+import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import { Pressable, useColorScheme, View, StyleSheet } from 'react-native';
 
 import { ExternalLink } from './external-link';
@@ -15,6 +15,10 @@ import { ThemedView } from './themed-view';
 
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
+type TabButtonProps = TabTriggerSlotProps & {
+  icon: SymbolViewProps['name'];
+};
+
 export default function AppTabs() {
   return (
     <Tabs>
@@ -22,13 +26,16 @@ export default function AppTabs() {
       <TabList asChild>
         <CustomTabList>
           <TabTrigger name="home" href="/" asChild>
-            <TabButton>Home</TabButton>
+            <TabButton icon={{ ios: 'house', web: 'home' }}>Home</TabButton>
           </TabTrigger>
           <TabTrigger name="schedule" href="/schedule" asChild>
-            <TabButton>Schedule</TabButton>
+            <TabButton icon={{ ios: 'calendar', web: 'calendar_month' }}>Schedule</TabButton>
           </TabTrigger>
-          <TabTrigger name="notifications" href="/notifications" asChild>
-            <TabButton>Notifications</TabButton>
+          <TabTrigger name="material" href="/material" asChild>
+            <TabButton icon={{ ios: 'book', web: 'menu_book' }}>Material</TabButton>
+          </TabTrigger>
+          <TabTrigger name="profile" href="/profile" asChild>
+            <TabButton icon={{ ios: 'person', web: 'person' }}>Profile</TabButton>
           </TabTrigger>
         </CustomTabList>
       </TabList>
@@ -36,12 +43,17 @@ export default function AppTabs() {
   );
 }
 
-export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
+export function TabButton({ children, isFocused, icon, ...props }: TabButtonProps) {
+  const scheme = useColorScheme();
+  const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
+  const iconColor = isFocused ? colors.text : colors.textSecondary;
+
   return (
     <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
       <ThemedView
         type={isFocused ? 'backgroundSelected' : 'backgroundElement'}
         style={styles.tabButtonView}>
+        <SymbolView name={icon} size={14} tintColor={iconColor} />
         <ThemedText type="small" themeColor={isFocused ? 'text' : 'textSecondary'}>
           {children}
         </ThemedText>
@@ -104,6 +116,9 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   tabButtonView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.one,
     paddingVertical: Spacing.one,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,

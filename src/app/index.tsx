@@ -1,60 +1,14 @@
-import {useEffect, useState} from 'react';
-import {ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View, Linking} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import * as WebBrowser from 'expo-web-browser';
+import {useMemo} from 'react';
+import {ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {useRouter} from 'expo-router';
 
+import {ScreenLayout} from '@/components/screen-layout';
 import {ThemedText} from '@/components/themed-text';
 import {ThemedView} from '@/components/themed-view';
-import {BottomTabInset, MaxContentWidth, Spacing} from '@/constants/theme';
-import {type Event as ApiEvent, fetchEvents} from '@/lib/api';
-
-type ClassItem = {
-  id: string;
-  subject: string;
-  description: string;
-  meetLink: string | null;
-  startTime: string;
-  endTime: string;
-  color: string;
-  startDate: Date;
-  endDate: Date;
-};
-
-const EVENT_COLORS = ['#3c87f7', '#AF52DE', '#34C759', '#FF9500', '#FF3B30', '#FF2D55'];
-
-function colorForTitle(title: string): string {
-  let h = 0;
-  for (let i = 0; i < title.length; i++) h = title.charCodeAt(i) + ((h << 5) - h);
-  return EVENT_COLORS[Math.abs(h) % EVENT_COLORS.length];
-}
-
-function toClassItem(event: ApiEvent): ClassItem {
-  const start = new Date(event.scheduledAt);
-  const end = new Date(start.getTime() + event.durationMinutes * 60_000);
-  const fmt = (d: Date) =>
-    `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  return {
-    id: event.id,
-    subject: event.title,
-    description: event.description ?? '',
-    meetLink: event.meetLink,
-    startTime: fmt(start),
-    endTime: fmt(end),
-    color: colorForTitle(event.title),
-    startDate: start,
-    endDate: end,
-  };
-}
-
-const RECENT_NOTIFS = [
-  { id: '1', emoji: '⏰', title: 'Class in 15 minutes', message: 'Mathematics with Mr. Sharma — Room 101', color: '#3c87f7' },
-  { id: '2', emoji: '🔄', title: 'Room Change – Science', message: 'Wednesday Science moved to Lab 5', color: '#FF9500' },
-];
-
-function formatTime(t: string) {
-  const [h, m] = t.split(':').map(Number);
-  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
-}
+import {BottomTabInset, Spacing} from '@/constants/theme';
+import {useWeekEvents} from '@/hooks/use-week-events';
+import {useNotificationsStore} from '@/store/notifications-store';
+import {type ClassItem, formatTime, handleJoinMeeting} from '@/lib/event-utils';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -63,387 +17,204 @@ function getGreeting() {
   return 'Good Evening';
 }
 
-function getWeekRange() {
+function isToday(date: Date): boolean {
   const today = new Date();
-  const day = today.getDay();
-  const diffToMon = day === 0 ? -6 : 1 - day;
-  const mon = new Date(today);
-  mon.setDate(today.getDate() + diffToMon);
-  mon.setHours(0, 0, 0, 0);
-  const sun = new Date(mon);
-  sun.setDate(mon.getDate() + 6);
-  sun.setHours(23, 59, 59, 999);
-  return { from: mon.toISOString(), to: sun.toISOString() };
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
 }
 
-const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
-type Weekday = (typeof WEEKDAYS)[number];
-const WEEKDAY_BY_INDEX: Record<number, Weekday> = {
-  1: 'Monday',
-  2: 'Tuesday',
-  3: 'Wednesday',
-  4: 'Thursday',
-  5: 'Friday',
-  6: 'Saturday',
-  0: 'Sunday',
-};
-
-function getOngoingAndNextClass(classes: ClassItem[]) {
+function getHighlightClass(classes: ClassItem[]) {
   const now = new Date();
-  
-  // Sort classes by start time to make sure they are in chronological order
   const sorted = [...classes].sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
-  
   const ongoing = sorted.find((cls) => now >= cls.startDate && now <= cls.endDate);
-  if (ongoing) {
-    return { current: ongoing, isOngoing: true };
-  }
-  
+  if (ongoing) return { current: ongoing, isOngoing: true };
   const next = sorted.find((cls) => cls.startDate > now);
   return { current: next ?? null, isOngoing: false };
 }
 
-const handleJoinMeeting = async (url: string) => {
-  try {
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      await WebBrowser.openBrowserAsync(url);
-    } else {
-      await Linking.openURL(url);
-    }
-  } catch (error) {
-    console.error('Failed to open meeting link:', error);
-  }
-};
+type UpcomingRowProps = { item: ClassItem; onPress: () => void };
+
+function UpcomingRow({ item, onPress }: UpcomingRowProps) {
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.75}>
+      <ThemedView type="backgroundElement" style={styles.upcomingRow}>
+        <View style={[styles.upcomingDot, { backgroundColor: item.color }]} />
+        <View style={styles.upcomingBody}>
+          <ThemedText type="smallBold" numberOfLines={1}>{item.subject}</ThemedText>
+          {!!item.description && (
+            <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{item.description}</ThemedText>
+          )}
+        </View>
+        <View style={[styles.timePill, { backgroundColor: item.color + '20' }]}>
+          <ThemedText type="smallBold" style={{ color: item.color, fontSize: 12 }}>
+            {formatTime(item.startTime)}
+          </ThemedText>
+        </View>
+      </ThemedView>
+    </TouchableOpacity>
+  );
+}
 
 export default function HomeScreen() {
-  const [classes, setClasses] = useState<ClassItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { events: allEvents, loading, error } = useWeekEvents();
+  const router = useRouter();
+  const unreadCount = useNotificationsStore((s) => s.notifs.filter((n) => !n.read).length);
 
-  useEffect(() => {
-    const { from, to } = getWeekRange();
+  const todayClasses = useMemo(
+    () => allEvents.filter((cls) => isToday(cls.startDate)),
+    [allEvents],
+  );
 
-    fetchEvents({ from, to })
-      .then((events) => {
-        const sorted = [...events].sort(
-          (a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime(),
-        );
-        setClasses(sorted.map(toClassItem));
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+  const { current: highlightClass, isOngoing } = useMemo(
+    () => getHighlightClass(todayClasses),
+    [todayClasses],
+  );
 
-  const { current: highlightClass, isOngoing } = getOngoingAndNextClass(classes);
+  const upcomingClasses = useMemo(() => {
+    const now = new Date();
+    return todayClasses
+      .filter((cls) => cls !== highlightClass && cls.startDate > now)
+      .slice(0, 5);
+  }, [todayClasses, highlightClass]);
+
   const today = new Date().toLocaleDateString('en-IN', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
+    weekday: 'long', month: 'long', day: 'numeric',
   });
 
-  // Group classes by weekday
-  const groupedClasses: Partial<Record<Weekday, ClassItem[]>> = {};
-  for (const cls of classes) {
-    const dayName = WEEKDAY_BY_INDEX[cls.startDate.getDay()];
-    if (dayName) {
-      if (!groupedClasses[dayName]) {
-        groupedClasses[dayName] = [];
-      }
-      groupedClasses[dayName]!.push(cls);
-    }
-  }
-
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: BottomTabInset + Spacing.three }]}>
+    <ScreenLayout>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: BottomTabInset + Spacing.three }]}>
 
-          <ThemedView style={styles.header}>
+        {/* Header */}
+        <ThemedView style={styles.header}>
+          <View>
             <ThemedText type="small" themeColor="textSecondary">{today}</ThemedText>
             <ThemedText type="subtitle">{getGreeting()}</ThemedText>
-          </ThemedView>
+          </View>
+          <TouchableOpacity
+            style={styles.bellBtn}
+            onPress={() => router.push('/notifications')}
+            activeOpacity={0.7}>
+            <ThemedText style={styles.bellEmoji}>🔔</ThemedText>
+            {unreadCount > 0 && (
+              <View style={styles.bellBadge}>
+                <ThemedText style={styles.bellBadgeText}>{unreadCount}</ThemedText>
+              </View>
+            )}
+          </TouchableOpacity>
+        </ThemedView>
 
-          {loading ? (
-            <ThemedView type="backgroundElement" style={styles.loadingCard}>
-              <ActivityIndicator />
-            </ThemedView>
-          ) : error ? (
-            <ThemedView type="backgroundElement" style={styles.noClassCard}>
-              <ThemedText type="default" themeColor="textSecondary">Could not load schedule</ThemedText>
-            </ThemedView>
-          ) : highlightClass ? (
-            <ThemedView type="backgroundElement" style={styles.highlightCard}>
-              <View style={styles.highlightCardHeader}>
-                <View style={styles.headerLabelContainer}>
-                  <ThemedText type="smallBold" style={{ color: isOngoing ? '#FF3B30' : '#3c87f7' }}>
-                    {isOngoing ? 'LIVE NOW' : 'NEXT CLASS'}
+        {/* Next / Ongoing Class */}
+        <ThemedText type="smallBold" style={styles.sectionTitle}>
+          {isOngoing ? 'LIVE NOW' : 'NEXT CLASS'}
+        </ThemedText>
+
+        {loading ? (
+          <ThemedView type="backgroundElement" style={styles.loadingCard}>
+            <ActivityIndicator />
+          </ThemedView>
+        ) : error ? (
+          <ThemedView type="backgroundElement" style={styles.emptyCard}>
+            <ThemedText type="default" themeColor="textSecondary">Could not load schedule</ThemedText>
+          </ThemedView>
+        ) : !highlightClass ? (
+          <ThemedView type="backgroundElement" style={styles.emptyCard}>
+            <ThemedText type="default" themeColor="textSecondary">No more classes today</ThemedText>
+          </ThemedView>
+        ) : (
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => router.push(`/class/${highlightClass.id}`)}>
+            <ThemedView
+              type="backgroundElement"
+              style={styles.heroCard}>
+              <View style={styles.heroBadgeRow}>
+                <View style={[styles.liveBadge, { backgroundColor: (isOngoing ? '#FF3B30' : highlightClass.color) + '20' }]}>
+                  <View style={[styles.liveDot, { backgroundColor: isOngoing ? '#FF3B30' : highlightClass.color }]} />
+                  <ThemedText
+                    type="smallBold"
+                    style={{ color: isOngoing ? '#FF3B30' : highlightClass.color, fontSize: 11, letterSpacing: 0.8 }}>
+                    {isOngoing ? 'LIVE' : 'UPCOMING'}
                   </ThemedText>
-                  <View style={[styles.liveDot, { backgroundColor: isOngoing ? '#FF3B30' : '#3c87f7' }]} />
                 </View>
               </View>
-              <View style={[styles.highlightCardAccent, { backgroundColor: highlightClass.color }]} />
-              <ThemedText type="subtitle" style={styles.highlightSubject}>{highlightClass.subject}</ThemedText>
+              <ThemedText type="subtitle" style={styles.heroTitle}>{highlightClass.subject}</ThemedText>
               {!!highlightClass.description && (
                 <ThemedText type="small" themeColor="textSecondary">{highlightClass.description}</ThemedText>
               )}
-              <View style={styles.highlightMetaRow}>
-                <View style={[styles.highlightTimePill, { backgroundColor: highlightClass.color + '20' }]}>
-                  <ThemedText type="smallBold" style={{ color: highlightClass.color }}>
+              <View style={styles.heroMeta}>
+                <View style={[styles.timePill, { backgroundColor: highlightClass.color + '20' }]}>
+                  <ThemedText type="smallBold" style={{ color: highlightClass.color, fontSize: 13 }}>
                     {formatTime(highlightClass.startTime)} – {formatTime(highlightClass.endTime)}
                   </ThemedText>
                 </View>
                 {highlightClass.meetLink && (
                   <TouchableOpacity
-                    style={[styles.joinBtn, { backgroundColor: '#3c87f7' }]}
-                    onPress={() => handleJoinMeeting(highlightClass.meetLink!)}
-                    activeOpacity={0.8}>
-                    <ThemedText type="smallBold" style={styles.joinBtnText}>Join Meeting</ThemedText>
+                    style={[styles.joinBtn, { backgroundColor: '#FF3B30' }]}
+                    onPress={(e) => {
+                      e.stopPropagation?.();
+                      handleJoinMeeting(highlightClass.meetLink!);
+                    }}
+                    activeOpacity={0.85}>
+                    <ThemedText style={styles.joinBtnText}>▶  Join Live</ThemedText>
                   </TouchableOpacity>
                 )}
               </View>
             </ThemedView>
-          ) : (
-            <ThemedView type="backgroundElement" style={styles.noClassCard}>
-              <ThemedText type="default" themeColor="textSecondary">No upcoming classes scheduled</ThemedText>
-            </ThemedView>
-          )}
+          </TouchableOpacity>
+        )}
 
-          <ThemedText type="smallBold" style={styles.sectionTitle}>Weekly Schedule</ThemedText>
-
-          {loading ? (
-            <View style={styles.loadingInline}>
-              <ActivityIndicator />
+        {/* Today's Upcoming */}
+        {!loading && !error && upcomingClasses.length > 0 && (
+          <>
+            <ThemedText type="smallBold" style={styles.sectionTitle}>TODAY'S UPCOMING</ThemedText>
+            <View style={styles.upcomingList}>
+              {upcomingClasses.map((cls) => (
+                <UpcomingRow
+                  key={cls.id}
+                  item={cls}
+                  onPress={() => router.push(`/class/${cls.id}`)}
+                />
+              ))}
             </View>
-          ) : error ? (
-            <ThemedView type="backgroundElement" style={styles.noClassCard}>
-              <ThemedText type="small" themeColor="textSecondary">{error}</ThemedText>
-            </ThemedView>
-          ) : classes.length === 0 ? (
-            <ThemedView type="backgroundElement" style={styles.noClassCard}>
-              <ThemedText type="default" themeColor="textSecondary">No classes scheduled for this week</ThemedText>
-            </ThemedView>
-          ) : (
-            <View style={styles.scheduleList}>
-              {WEEKDAYS.map((day) => {
-                const dayClasses = groupedClasses[day] ?? [];
-                
-                // Show weekend days (Sat/Sun) only if they have classes
-                const isWeekend = day === 'Saturday' || day === 'Sunday';
-                if (isWeekend && dayClasses.length === 0) return null;
-                
-                return (
-                  <View key={day} style={styles.daySection}>
-                    <ThemedText type="smallBold" style={styles.dayHeader}>
-                      {day}
-                    </ThemedText>
-                    {dayClasses.length === 0 ? (
-                      <ThemedView type="backgroundElement" style={styles.emptyDayCard}>
-                        <ThemedText type="small" themeColor="textSecondary">
-                          No classes scheduled
-                        </ThemedText>
-                      </ThemedView>
-                    ) : (
-                      <View style={styles.dayClasses}>
-                        {dayClasses.map((cls) => (
-                          <ThemedView key={cls.id} type="backgroundElement" style={styles.classCard}>
-                            <View style={[styles.classColorBar, { backgroundColor: cls.color }]} />
-                            <View style={styles.classCardBody}>
-                              <View style={styles.classCardHeader}>
-                                <ThemedText type="smallBold" style={styles.classSubject}>
-                                  {cls.subject}
-                                </ThemedText>
-                                <View style={[styles.classTimePill, { backgroundColor: cls.color + '15' }]}>
-                                  <ThemedText type="small" style={{ color: cls.color, fontWeight: '600', fontSize: 12 }}>
-                                    {formatTime(cls.startTime)}
-                                  </ThemedText>
-                                </View>
-                              </View>
-                              {!!cls.description && (
-                                <ThemedText type="small" themeColor="textSecondary">
-                                  {cls.description}
-                                </ThemedText>
-                              )}
-                              <View style={styles.classCardMeta}>
-                                <ThemedText type="small" themeColor="textSecondary">
-                                  {formatTime(cls.startTime)} – {formatTime(cls.endTime)}
-                                </ThemedText>
-                                {cls.meetLink && (
-                                  <TouchableOpacity
-                                    style={[styles.classJoinBtn, { backgroundColor: '#3c87f7' }]}
-                                    onPress={() => handleJoinMeeting(cls.meetLink!)}
-                                    activeOpacity={0.8}>
-                                    <ThemedText type="smallBold" style={styles.classJoinBtnText}>
-                                      Join Meeting
-                                    </ThemedText>
-                                  </TouchableOpacity>
-                                )}
-                              </View>
-                            </View>
-                          </ThemedView>
-                        ))}
-                      </View>
-                    )}
-                  </View>
-                );
-              })}
-            </View>
-          )}
+          </>
+        )}
 
-          <ThemedText type="smallBold" style={styles.sectionTitle}>Recent Notifications</ThemedText>
-          <View style={styles.notifList}>
-            {RECENT_NOTIFS.map((n) => (
-              <ThemedView key={n.id} type="backgroundElement" style={styles.notifRow}>
-                <View style={[styles.notifIcon, { backgroundColor: n.color + '20' }]}>
-                  <ThemedText style={styles.notifEmoji}>{n.emoji}</ThemedText>
-                </View>
-                <View style={styles.notifText}>
-                  <ThemedText type="smallBold">{n.title}</ThemedText>
-                  <ThemedText type="small" themeColor="textSecondary">{n.message}</ThemedText>
-                </View>
-              </ThemedView>
-            ))}
-          </View>
-
-        </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+      </ScrollView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, flexDirection: 'row', justifyContent: 'center' },
-  safeArea: { flex: 1, maxWidth: MaxContentWidth },
   scrollContent: { padding: Spacing.three, gap: Spacing.three },
-  header: { gap: Spacing.half, paddingBottom: Spacing.one },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: Spacing.one },
+  bellBtn: { position: 'relative', padding: Spacing.one },
+  bellEmoji: { fontSize: 22 },
+  bellBadge: {
+    position: 'absolute', top: 0, right: 0,
+    backgroundColor: '#FF3B30', borderRadius: 8,
+    minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3,
+  },
+  bellBadgeText: { color: '#fff', fontSize: 10, fontWeight: '700' },
+  sectionTitle: { fontSize: 12, letterSpacing: 0.8, opacity: 0.7, textTransform: 'uppercase' },
   loadingCard: { borderRadius: Spacing.four, padding: Spacing.four, alignItems: 'center' },
-  loadingInline: { padding: Spacing.three, alignItems: 'center' },
-  highlightCard: {
-    borderRadius: Spacing.four,
-    padding: Spacing.four,
-    gap: Spacing.two,
-    overflow: 'hidden',
-  },
-  highlightCardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  headerLabelContainer: { flexDirection: 'row', alignItems: 'center', gap: Spacing.one },
-  liveDot: { width: 8, height: 8, borderRadius: 4 },
-  highlightCardAccent: {
-    position: 'absolute',
-    top: -20,
-    right: -20,
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    opacity: 0.08,
-  },
-  highlightSubject: { lineHeight: 38 },
-  highlightMetaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: Spacing.one,
-  },
-  highlightTimePill: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.one,
-    borderRadius: Spacing.two,
-  },
-  joinBtn: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.one + 2,
-    borderRadius: Spacing.two,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  joinBtnText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  noClassCard: { borderRadius: Spacing.four, padding: Spacing.four, alignItems: 'center' },
-  sectionTitle: { marginTop: Spacing.one },
-  scheduleList: { gap: Spacing.one },
-  daySection: {
-    marginBottom: Spacing.two,
-    gap: Spacing.two,
-  },
-  dayHeader: {
-    fontSize: 15,
-    fontWeight: '700',
-    marginTop: Spacing.two,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    opacity: 0.8,
-  },
-  emptyDayCard: {
-    borderRadius: Spacing.two,
-    padding: Spacing.three,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayClasses: {
-    gap: Spacing.two,
-  },
-  classCard: {
-    flexDirection: 'row',
-    borderRadius: Spacing.three,
-    overflow: 'hidden',
-  },
-  classColorBar: {
-    width: 4,
-  },
-  classCardBody: {
-    flex: 1,
-    padding: Spacing.three,
-    gap: Spacing.half,
-  },
-  classCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  classSubject: {
-    fontSize: 15,
-    fontWeight: '600',
-    flex: 1,
-    marginRight: Spacing.two,
-  },
-  classTimePill: {
-    paddingHorizontal: Spacing.two,
-    paddingVertical: 2,
-    borderRadius: Spacing.two,
-  },
-  classCardMeta: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: Spacing.one,
-  },
-  classJoinBtn: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.one,
-    borderRadius: Spacing.two,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  classJoinBtnText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  notifList: { gap: Spacing.two },
-  notifRow: {
-    flexDirection: 'row',
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
-    gap: Spacing.three,
-    alignItems: 'center',
-  },
-  notifIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  notifEmoji: { fontSize: 18 },
-  notifText: { flex: 1, gap: Spacing.half },
+  emptyCard: { borderRadius: Spacing.four, padding: Spacing.four, alignItems: 'center' },
+  heroCard: { borderRadius: Spacing.four, padding: Spacing.four, gap: Spacing.three },
+  heroBadgeRow: { flexDirection: 'row' },
+  liveBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  liveDot: { width: 7, height: 7, borderRadius: 3.5 },
+  heroTitle: { lineHeight: 38 },
+  heroMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: Spacing.one },
+  timePill: { paddingHorizontal: Spacing.three, paddingVertical: Spacing.one, borderRadius: Spacing.two },
+  joinBtn: { paddingHorizontal: Spacing.three, paddingVertical: Spacing.two - 2, borderRadius: Spacing.two, alignItems: 'center' },
+  joinBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  upcomingList: { gap: Spacing.two },
+  upcomingRow: { flexDirection: 'row', alignItems: 'center', padding: Spacing.three, borderRadius: Spacing.three, gap: Spacing.three },
+  upcomingDot: { width: 10, height: 10, borderRadius: 5, flexShrink: 0 },
+  upcomingBody: { flex: 1, gap: Spacing.half },
 });

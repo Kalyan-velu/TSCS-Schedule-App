@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AIDiffSettings">
+    <option name="showAIDiff" value="false" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="33fa88d5-a9f8-4368-b0fc-958f501ee660" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/TSCS-App.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TSCS-App.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/awsToolkit.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/git_toolbox_prj.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AGENTS.md" beforeDir="false" afterPath="$PROJECT_DIR$/AGENTS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/notifications.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/notifications.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/schedule.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/schedule.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/app-tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/app-tabs.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/app-tabs.web.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/app-tabs.web.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_E:/TSCS-App" value="3ERO3J4ktP7u0NgzPRaLGvLHEeN" />
+    </persistenceIdMap>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="88" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0000000000000002" />
+      <entry key="S30" value="1.000015303089777" />
+      <entry key="S60" value="1.0092402966647733" />
+      <entry key="M2" value="1.280309245404656" />
+      <entry key="M5" value="3.9170320123947624" />
+      <entry key="M10" value="7.89602217177792" />
+      <entry key="M15" value="10.273292999851796" />
+      <entry key="M30" value="13.527621313141065" />
+      <entry key="H1" value="15.632338907955445" />
+      <entry key="H2" value="18.19745982378281" />
+      <entry key="H4" value="25.445338068527764" />
+      <entry key="D1" value="51.69472074369986" />
+      <entry key="W1" value="61.18226802545181" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="4.824869736858601E-21" />
+      <entry key="MS500" value="8.643648914883687E-5" />
+      <entry key="S2" value="0.09642158797383449" />
+      <entry key="S5" value="0.39234643594364443" />
+      <entry key="S10" value="0.6263756348579058" />
+      <entry key="S30" value="0.8556147943536364" />
+      <entry key="S60" value="0.9249944834179481" />
+      <entry key="M2" value="0.9617663351448458" />
+      <entry key="M5" value="0.9845274480762021" />
+      <entry key="M10" value="0.9922335652840022" />
+      <entry key="M15" value="0.9948156516730565" />
+      <entry key="M30" value="0.9974055491484062" />
+      <entry key="H1" value="0.9997462458470422" />
+      <entry key="H2" value="1.0316747813330278" />
+      <entry key="H4" value="1.1794647860654672" />
+      <entry key="D1" value="1.7512124785164762" />
+      <entry key="W1" value="1.9599592544699762" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.612479644956678E-10" />
+      <entry key="MS500" value="0.011003415034822635" />
+      <entry key="S2" value="0.35306058826669307" />
+      <entry key="S5" value="0.8802802181737228" />
+      <entry key="S10" value="1.2913513057038066" />
+      <entry key="S30" value="1.717706104789935" />
+      <entry key="S60" value="1.861175685167348" />
+      <entry key="M2" value="2.2020773245563925" />
+      <entry key="M5" value="4.868280524170565" />
+      <entry key="M10" value="8.856215452525174" />
+      <entry key="M15" value="11.24030373648757" />
+      <entry key="M30" value="14.506613049666369" />
+      <entry key="H1" value="16.62142454537038" />
+      <entry key="H2" value="19.223298857884902" />
+      <entry key="H4" value="26.62155433044005" />
+      <entry key="D1" value="53.445234442443926" />
+      <entry key="W1" value="63.142119706032545" />
+    </decayedShown>
+  </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3ERO3J4ktP7u0NgzPRaLGvLHEeN" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "E:/TSCS-App",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "npm.android.executor": "Run",
+    "npm.web.executor": "Run",
+    "settings.editor.selected.configurable": "actions.on.save",
+    "show.migrate.to.gradle.popup": "false",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "E:\\TSCS-App\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="ReactDesignerToolWindowState">
+    <option name="myId2Visible">
+      <map>
+        <entry key="com.intellij.reactbuddy.reactComponents" value="false" />
+        <entry key="com.intellij.reactbuddy.reactInspector" value="false" />
+        <entry key="com.intellij.reactbuddy.storybook" value="false" />
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="npm.web">
+    <configuration name="android" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="android" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="web" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="web" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.web" />
+        <item itemvalue="npm.android" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-WS-261.24374.125" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="33fa88d5-a9f8-4368-b0fc-958f501ee660" name="Changes" comment="" />
+      <created>1742448063335</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1742448063335</updated>
+      <workItem from="1780137777057" duration="3731000" />
+      <workItem from="1780168093014" duration="6274000" />
+      <workItem from="1780177247120" duration="3494000" />
+      <workItem from="1780215390009" duration="7763000" />
+      <workItem from="1780304353638" duration="1642000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

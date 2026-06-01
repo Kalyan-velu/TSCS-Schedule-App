@@ -1,215 +1,466 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View, Linking } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import * as WebBrowser from 'expo-web-browser';
+import { useCallback, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import * as Linking from 'expo-linking';
 
+import { ClassCard } from '@/components/class-card';
+import { ScreenLayout } from '@/components/screen-layout';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { fetchEvents, type Event as ApiEvent } from '@/lib/api';
+import { getWeekRange, useWeekEvents } from '@/hooks/use-week-events';
+import type { ClassItem } from '@/lib/event-utils';
+import { formatTime, handleJoinMeeting } from '@/lib/event-utils';
+import { useScheduleStore } from '@/store/schedule-store';
 
-const handleJoinMeeting = async (url: string) => {
-  try {
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      await WebBrowser.openBrowserAsync(url);
+/* ──────────────────────────────────────────────────────────────
+   Constants / helpers
+   ────────────────────────────────────────────────────────────── */
+
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
+type Day = (typeof DAYS)[number];
+
+const DAY_BY_INDEX: Record<number, Day> = {
+  0: 'Sun', 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat',
+};
+
+function getTodayDayIndex(): number {
+  const d = new Date().getDay(); // 0=Sun, 1=Mon … 6=Sat
+  // DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] → indices 0–6
+  // Mon(1)→0, Tue(2)→1, … Sat(6)→5, Sun(0)→6
+  return d === 0 ? 6 : d - 1;
+}
+
+function isCurrentWeek(weekOffset: number) {
+  return weekOffset === 0;
+}
+
+/** Given the week start (Monday) + a DAYS index (0=Mon…6=Sun), return that day's Date */
+function dateForDayIndex(weekStart: Date, dayIndex: number): Date {
+  const d = new Date(weekStart);
+  d.setDate(weekStart.getDate() + dayIndex);
+  return d;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Add-to-Calendar helper
+   Uses platform-native calendar URLs — no extra package needed.
+   ────────────────────────────────────────────────────────────── */
+async function addEventToCalendar(item: ClassItem): Promise<void> {
+  /** Format Date → compact UTC string for Google Calendar */
+  const fmtGcal = (d: Date) =>
+    d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+  if (Platform.OS === 'ios') {
+    // Apple Calendar deep-link (opens the New Event sheet pre-filled)
+    // calshow:// accepts a Unix timestamp (seconds since 2001-01-01)
+    const APPLE_EPOCH_OFFSET = 978307200; // seconds between Unix and Apple epoch
+    const ts = Math.floor(item.startDate.getTime() / 1000) - APPLE_EPOCH_OFFSET;
+    const calUrl = `calshow:${ts}`;
+    const canOpen = await Linking.canOpenURL(calUrl);
+    if (canOpen) {
+      await Linking.openURL(calUrl);
     } else {
+      // Fallback: Google Calendar web
+      const url =
+        `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+        `&text=${encodeURIComponent(item.subject)}` +
+        `&dates=${fmtGcal(item.startDate)}/${fmtGcal(item.endDate)}` +
+        `&details=${encodeURIComponent(item.description ?? '')}` +
+        (item.meetLink ? `&location=${encodeURIComponent(item.meetLink)}` : '');
       await Linking.openURL(url);
     }
-  } catch (error) {
-    console.error('Failed to open meeting link:', error);
+    return;
   }
+
+  if (Platform.OS === 'android') {
+    // Android intent for inserting a calendar event
+    const startMs = item.startDate.getTime();
+    const endMs = item.endDate.getTime();
+    const intentUrl =
+      `content://com.android.calendar/time/${startMs}` +
+      `?beginTime=${startMs}&endTime=${endMs}` +
+      `&title=${encodeURIComponent(item.subject)}` +
+      `&description=${encodeURIComponent(item.description ?? '')}` +
+      (item.meetLink ? `&eventLocation=${encodeURIComponent(item.meetLink)}` : '');
+    const canOpen = await Linking.canOpenURL(intentUrl);
+    if (canOpen) {
+      await Linking.openURL(intentUrl);
+    } else {
+      const url =
+        `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+        `&text=${encodeURIComponent(item.subject)}` +
+        `&dates=${fmtGcal(item.startDate)}/${fmtGcal(item.endDate)}` +
+        `&details=${encodeURIComponent(item.description ?? '')}` +
+        (item.meetLink ? `&location=${encodeURIComponent(item.meetLink)}` : '');
+      await Linking.openURL(url);
+    }
+    return;
+  }
+
+  // Web fallback — open Google Calendar in a new tab
+  const url =
+    `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+    `&text=${encodeURIComponent(item.subject)}` +
+    `&dates=${fmtGcal(item.startDate)}/${fmtGcal(item.endDate)}` +
+    `&details=${encodeURIComponent(item.description ?? '')}` +
+    (item.meetLink ? `&location=${encodeURIComponent(item.meetLink)}` : '');
+  await Linking.openURL(url);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Event Detail Modal
+   ────────────────────────────────────────────────────────────── */
+type EventModalProps = {
+  item: ClassItem | null;
+  onClose: () => void;
 };
 
-type ClassItem = {
-  id: string;
-  subject: string;
-  description: string;
-  meetLink: string | null;
-  startTime: string;
-  endTime: string;
-  color: string;
-};
-
-const EVENT_COLORS = ['#3c87f7', '#AF52DE', '#34C759', '#FF9500', '#FF3B30', '#FF2D55'];
-
-function colorForTitle(title: string): string {
-  let h = 0;
-  for (let i = 0; i < title.length; i++) h = title.charCodeAt(i) + ((h << 5) - h);
-  return EVENT_COLORS[Math.abs(h) % EVENT_COLORS.length];
-}
-
-function toClassItem(event: ApiEvent): ClassItem {
-  const start = new Date(event.scheduledAt);
-  const end = new Date(start.getTime() + event.durationMinutes * 60_000);
-  const fmt = (d: Date) =>
-    `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  return {
-    id: event.id,
-    subject: event.title,
-    description: event.description ?? '',
-    meetLink: event.meetLink,
-    startTime: fmt(start),
-    endTime: fmt(end),
-    color: colorForTitle(event.title),
-  };
-}
-
-function getWeekRange() {
-  const today = new Date();
-  const day = today.getDay();
-  const diffToMon = day === 0 ? -6 : 1 - day;
-  const mon = new Date(today);
-  mon.setDate(today.getDate() + diffToMon);
-  mon.setHours(0, 0, 0, 0);
-  const sun = new Date(mon);
-  sun.setDate(mon.getDate() + 6);
-  sun.setHours(23, 59, 59, 999);
-  return { from: mon.toISOString(), to: sun.toISOString() };
-}
-
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as const;
-type Day = (typeof DAYS)[number];
-const DAY_BY_INDEX: Record<number, Day> = { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri' };
-
-function formatTime(t: string) {
-  const [h, m] = t.split(':').map(Number);
-  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
-}
-
-function getTodayIndex() {
-  const d = new Date().getDay();
-  return d === 0 || d === 6 ? 0 : d - 1;
-}
-
-export default function ScheduleScreen() {
-  const [schedule, setSchedule] = useState<Partial<Record<Day, ClassItem[]>>>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedDay, setSelectedDay] = useState(getTodayIndex());
+function EventDetailModal({ item, onClose }: EventModalProps) {
   const theme = useTheme();
-  const todayIndex = getTodayIndex();
 
-  useEffect(() => {
-    const { from, to } = getWeekRange();
-    fetchEvents({ from, to })
-      .then((events) => {
-        const grouped: Partial<Record<Day, ClassItem[]>> = {};
-        for (const event of events) {
-          const dayName = DAY_BY_INDEX[new Date(event.scheduledAt).getDay()];
-          if (!dayName) continue;
-          if (!grouped[dayName]) grouped[dayName] = [];
-          grouped[dayName]!.push(toClassItem(event));
-        }
-        for (const day of Object.keys(grouped) as Day[]) {
-          grouped[day]!.sort((a, b) => a.startTime.localeCompare(b.startTime));
-        }
-        setSchedule(grouped);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+  if (!item) return null;
 
-  const classes = schedule[DAYS[selectedDay]] ?? [];
+  const duration = Math.round(
+    (item.endDate.getTime() - item.startDate.getTime()) / 60_000,
+  );
+  const dateLabel = item.startDate.toLocaleDateString('en-IN', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  });
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.header}>
-          <ThemedText type="subtitle">Schedule</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
-            {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-          </ThemedText>
-        </ThemedView>
+    <Modal
+      visible={!!item}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+      statusBarTranslucent>
+      {/* Dim overlay */}
+      <Pressable style={styles.modalOverlay} onPress={onClose} />
 
-        <ThemedView type="backgroundElement" style={styles.dayPicker}>
-          {DAYS.map((day, i) => {
-            const isSelected = selectedDay === i;
-            const isToday = todayIndex === i;
-            return (
-              <TouchableOpacity
-                key={day}
-                onPress={() => setSelectedDay(i)}
-                style={[styles.dayBtn, isSelected && { backgroundColor: theme.text }]}
-                activeOpacity={0.7}>
-                <ThemedText
-                  type="smallBold"
-                  style={isSelected ? { color: theme.background } : undefined}
-                  themeColor={isSelected ? undefined : 'textSecondary'}>
-                  {day}
-                </ThemedText>
-                {isToday && (
-                  <View style={[styles.todayDot, { backgroundColor: isSelected ? theme.background : '#3c87f7' }]} />
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </ThemedView>
+      {/* Sheet */}
+      <View style={[styles.modalSheet, { backgroundColor: theme.backgroundElement }]}>
+        {/* Drag handle */}
+        <View style={[styles.dragHandle, { backgroundColor: theme.textSecondary + '40' }]} />
+
+        {/* Color accent bar */}
+        <View style={[styles.accentBar, { backgroundColor: item.color }]} />
 
         <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: BottomTabInset + Spacing.three }]}
-          showsVerticalScrollIndicator={false}>
-          {loading ? (
-            <View style={styles.loadingState}>
-              <ActivityIndicator />
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.modalScroll}>
+
+          {/* Badge */}
+          <View style={[styles.badge, { backgroundColor: item.color + '20' }]}>
+            <View style={[styles.badgeDot, { backgroundColor: item.color }]} />
+            <ThemedText type="smallBold" style={{ color: item.color, fontSize: 11, letterSpacing: 0.8 }}>
+              CLASS
+            </ThemedText>
+          </View>
+
+          {/* Title */}
+          <ThemedText type="subtitle" style={styles.modalTitle}>{item.subject}</ThemedText>
+
+          {/* Description */}
+          {!!item.description && (
+            <ThemedText type="small" themeColor="textSecondary" style={styles.modalDescription}>
+              {item.description}
+            </ThemedText>
+          )}
+
+          {/* Metadata rows */}
+          <View style={[styles.metaCard, { backgroundColor: theme.background + 'CC' }]}>
+            <View style={styles.metaRow}>
+              <ThemedText style={styles.metaIcon}>📅</ThemedText>
+              <View style={styles.metaBody}>
+                <ThemedText type="small" themeColor="textSecondary">Date</ThemedText>
+                <ThemedText type="smallBold">{dateLabel}</ThemedText>
+              </View>
             </View>
-          ) : error ? (
-            <ThemedView type="backgroundElement" style={styles.emptyState}>
-              <ThemedText type="default" themeColor="textSecondary">Could not load schedule</ThemedText>
-            </ThemedView>
-          ) : classes.length === 0 ? (
-            <ThemedView type="backgroundElement" style={styles.emptyState}>
-              <ThemedText type="default" themeColor="textSecondary">No classes scheduled</ThemedText>
-            </ThemedView>
-          ) : (
-            classes.map((cls) => (
-              <ThemedView key={cls.id} type="backgroundElement" style={styles.card}>
-                <View style={[styles.colorBar, { backgroundColor: cls.color }]} />
-                <View style={styles.cardBody}>
-                  <View style={styles.cardTop}>
-                    <ThemedText type="smallBold" style={styles.subjectText}>{cls.subject}</ThemedText>
-                    <View style={[styles.timePill, { backgroundColor: cls.color + '20' }]}>
-                      <ThemedText type="small" style={[styles.timeText, { color: cls.color }]}>
-                        {formatTime(cls.startTime)}
-                      </ThemedText>
-                    </View>
-                  </View>
-                  {!!cls.description && (
-                    <ThemedText type="small" themeColor="textSecondary">{cls.description}</ThemedText>
-                  )}
-                  <View style={styles.cardMeta}>
-                    <ThemedText type="small" themeColor="textSecondary">
-                      {formatTime(cls.startTime)} – {formatTime(cls.endTime)}
+
+            <View style={[styles.metaDivider, { backgroundColor: theme.textSecondary + '20' }]} />
+
+            <View style={styles.metaRow}>
+              <ThemedText style={styles.metaIcon}>🕐</ThemedText>
+              <View style={styles.metaBody}>
+                <ThemedText type="small" themeColor="textSecondary">Time</ThemedText>
+                <ThemedText type="smallBold">
+                  {formatTime(item.startTime)} – {formatTime(item.endTime)}
+                </ThemedText>
+              </View>
+            </View>
+
+            <View style={[styles.metaDivider, { backgroundColor: theme.textSecondary + '20' }]} />
+
+            <View style={styles.metaRow}>
+              <ThemedText style={styles.metaIcon}>⏱️</ThemedText>
+              <View style={styles.metaBody}>
+                <ThemedText type="small" themeColor="textSecondary">Duration</ThemedText>
+                <ThemedText type="smallBold">{duration} minutes</ThemedText>
+              </View>
+            </View>
+
+            {item.meetLink && (
+              <>
+                <View style={[styles.metaDivider, { backgroundColor: theme.textSecondary + '20' }]} />
+                <View style={styles.metaRow}>
+                  <ThemedText style={styles.metaIcon}>🔗</ThemedText>
+                  <View style={styles.metaBody}>
+                    <ThemedText type="small" themeColor="textSecondary">Meeting Link</ThemedText>
+                    <ThemedText
+                      type="smallBold"
+                      style={{ color: item.color }}
+                      numberOfLines={1}>
+                      {item.meetLink}
                     </ThemedText>
-                    {cls.meetLink && (
-                      <TouchableOpacity
-                        style={[styles.joinBtn, { backgroundColor: '#3c87f7' }]}
-                        onPress={() => handleJoinMeeting(cls.meetLink!)}
-                        activeOpacity={0.8}>
-                        <ThemedText type="smallBold" style={styles.joinBtnText}>
-                          Join Meeting
-                        </ThemedText>
-                      </TouchableOpacity>
-                    )}
                   </View>
                 </View>
-              </ThemedView>
-            ))
-          )}
+              </>
+            )}
+          </View>
+
+          {/* Actions */}
+          <View style={styles.actions}>
+            {item.meetLink && (
+              <TouchableOpacity
+                style={[styles.joinBtn, { backgroundColor: item.color }]}
+                onPress={() => handleJoinMeeting(item.meetLink!)}
+                activeOpacity={0.85}>
+                <ThemedText style={styles.joinBtnText}>▶  Join Live Class</ThemedText>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={[styles.calendarBtn, { borderColor: item.color + '60', backgroundColor: item.color + '12' }]}
+              onPress={() => addEventToCalendar(item)}
+              activeOpacity={0.8}>
+              <ThemedText style={styles.calendarBtnText}>
+                🗓️  Add to Calendar
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+
+        {/* Close button */}
+        <TouchableOpacity style={styles.closeBtn} onPress={onClose} activeOpacity={0.7}>
+          <ThemedText type="smallBold" themeColor="textSecondary">Close</ThemedText>
+        </TouchableOpacity>
+      </View>
+    </Modal>
   );
 }
 
+/* ──────────────────────────────────────────────────────────────
+   Schedule Screen
+   ────────────────────────────────────────────────────────────── */
+export default function ScheduleScreen() {
+  const { selectedDay, setSelectedDay, weekOffset, setWeekOffset } = useScheduleStore();
+  const { events, loading, error } = useWeekEvents(weekOffset);
+  const theme = useTheme();
+  const todayDayIndex = getTodayDayIndex();
+
+  const [selectedEvent, setSelectedEvent] = useState<ClassItem | null>(null);
+
+  /* Compute the week's Monday date */
+  const { weekStart } = getWeekRange(weekOffset);
+
+  /* Date label for the selected day */
+  const selectedDate = dateForDayIndex(weekStart, selectedDay);
+  const selectedDateLabel = selectedDate.toLocaleDateString('en-IN', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  });
+
+  /* Week label in the navigation bar */
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  const weekLabel = (() => {
+    const fmt = (d: Date) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    if (weekOffset === 0) return 'This Week';
+    if (weekOffset === -1) return 'Last Week';
+    if (weekOffset === 1) return 'Next Week';
+    return `${fmt(weekStart)} – ${fmt(weekEnd)}`;
+  })();
+
+  /* Group events by weekday */
+  const schedule = useMemo(() => {
+    const grouped: Partial<Record<Day, ClassItem[]>> = {};
+    for (const event of events) {
+      const dayName = DAY_BY_INDEX[event.startDate.getDay()];
+      if (!dayName) continue;
+      if (!grouped[dayName]) grouped[dayName] = [];
+      grouped[dayName]!.push(event);
+    }
+    return grouped;
+  }, [events]);
+
+  const classes = schedule[DAYS[selectedDay]] ?? [];
+
+  /* Whether today falls in the currently visible week */
+  const todayInThisWeek = isCurrentWeek(weekOffset);
+
+  const handleDayPress = useCallback((i: number) => {
+    setSelectedDay(i);
+  }, [setSelectedDay]);
+
+  return (
+    <ScreenLayout>
+      {/* ── Header ── */}
+      <ThemedView style={styles.header}>
+        <ThemedText type="subtitle">Schedule</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{selectedDateLabel}</ThemedText>
+      </ThemedView>
+
+      {/* ── Week navigation ── */}
+      <View style={styles.weekNav}>
+        <TouchableOpacity
+          onPress={() => setWeekOffset(weekOffset - 1)}
+          style={[styles.weekNavBtn, { backgroundColor: theme.backgroundElement }]}
+          activeOpacity={0.7}>
+          <ThemedText style={styles.weekNavArrow}>‹</ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => { setWeekOffset(0); setSelectedDay(getTodayDayIndex()); }}
+          activeOpacity={0.8}>
+          <ThemedText type="smallBold" style={styles.weekLabel}>{weekLabel}</ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setWeekOffset(weekOffset + 1)}
+          style={[styles.weekNavBtn, { backgroundColor: theme.backgroundElement }]}
+          activeOpacity={0.7}>
+          <ThemedText style={styles.weekNavArrow}>›</ThemedText>
+        </TouchableOpacity>
+      </View>
+
+      {/* ── Day picker ── */}
+      <ThemedView type="backgroundElement" style={styles.dayPicker}>
+        {DAYS.map((day, i) => {
+          const isSelected = selectedDay === i;
+          const isToday = todayInThisWeek && todayDayIndex === i;
+          const dayDate = dateForDayIndex(weekStart, i);
+          const dayNumber = dayDate.getDate();
+
+          return (
+            <TouchableOpacity
+              key={day}
+              onPress={() => handleDayPress(i)}
+              style={[styles.dayBtn, isSelected && { backgroundColor: theme.text }]}
+              activeOpacity={0.7}>
+              <ThemedText
+                type="smallBold"
+                style={[
+                  styles.dayBtnLabel,
+                  isSelected ? { color: theme.background } : undefined,
+                ]}
+                themeColor={isSelected ? undefined : 'textSecondary'}>
+                {isToday ? 'Today' : day}
+              </ThemedText>
+              <ThemedText
+                type="small"
+                style={[
+                  styles.dayNumber,
+                  { color: isSelected ? theme.background : theme.textSecondary },
+                ]}>
+                {dayNumber}
+              </ThemedText>
+              {isToday && (
+                <View
+                  style={[
+                    styles.todayDot,
+                    { backgroundColor: isSelected ? theme.background : '#3c87f7' },
+                  ]}
+                />
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </ThemedView>
+
+      {/* ── Classes list ── */}
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: BottomTabInset + Spacing.three },
+        ]}
+        showsVerticalScrollIndicator={false}>
+        {loading ? (
+          <View style={styles.loadingState}>
+            <ActivityIndicator />
+          </View>
+        ) : error ? (
+          <ThemedView type="backgroundElement" style={styles.emptyState}>
+            <ThemedText type="default" themeColor="textSecondary">
+              Could not load schedule
+            </ThemedText>
+          </ThemedView>
+        ) : classes.length === 0 ? (
+          <ThemedView type="backgroundElement" style={styles.emptyState}>
+            <ThemedText type="default" themeColor="textSecondary">
+              No classes scheduled
+            </ThemedText>
+          </ThemedView>
+        ) : (
+          classes.map((cls) => (
+            <ClassCard
+              key={cls.id}
+              item={cls}
+              onPress={() => setSelectedEvent(cls)}
+            />
+          ))
+        )}
+      </ScrollView>
+
+      {/* ── Event detail modal ── */}
+      <EventDetailModal
+        item={selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+      />
+    </ScreenLayout>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Styles
+   ────────────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({
-  container: { flex: 1, flexDirection: 'row', justifyContent: 'center' },
-  safeArea: { flex: 1, maxWidth: MaxContentWidth },
-  header: { paddingHorizontal: Spacing.three, paddingTop: Spacing.four, paddingBottom: Spacing.two, gap: Spacing.half },
+  /* Header */
+  header: {
+    paddingHorizontal: Spacing.three,
+    paddingTop: Spacing.four,
+    paddingBottom: Spacing.two,
+    gap: Spacing.half,
+  },
+
+  /* Week navigation */
+  weekNav: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: Spacing.three,
+    marginBottom: Spacing.two,
+  },
+  weekNavBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  weekNavArrow: { fontSize: 22, lineHeight: 24, marginTop: -2 },
+  weekLabel: { fontSize: 14 },
+
+  /* Day picker */
   dayPicker: {
     flexDirection: 'row',
     marginHorizontal: Spacing.three,
@@ -223,36 +474,86 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.two,
     alignItems: 'center',
     borderRadius: Spacing.two,
-    gap: Spacing.half,
+    gap: 2,
   },
+  dayBtnLabel: { fontSize: 11 },
+  dayNumber: { fontSize: 13, fontWeight: '700' },
   todayDot: { width: 4, height: 4, borderRadius: 2 },
+
+  /* List */
   scroll: { flex: 1 },
   loadingState: { padding: Spacing.four, alignItems: 'center' },
   scrollContent: { paddingHorizontal: Spacing.three, gap: Spacing.two },
-  emptyState: { borderRadius: Spacing.three, padding: Spacing.four, alignItems: 'center' },
-  card: {
-    flexDirection: 'row',
+  emptyState: {
     borderRadius: Spacing.three,
-    overflow: 'hidden',
-    minHeight: 90,
-  },
-  colorBar: { width: 4 },
-  cardBody: { flex: 1, padding: Spacing.three, gap: Spacing.half },
-  cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  subjectText: { flex: 1, marginRight: Spacing.two },
-  timePill: { paddingHorizontal: Spacing.two, paddingVertical: 3, borderRadius: Spacing.two },
-  timeText: { fontSize: 12, fontWeight: '600' },
-  cardMeta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: Spacing.one },
-  joinBtn: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.one,
-    borderRadius: Spacing.two,
+    padding: Spacing.four,
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  joinBtnText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '600',
+
+  /* ── Modal ── */
+  modalOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  modalSheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 24,
+    overflow: 'hidden',
+    maxHeight: '90%',
+  },
+  dragHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginTop: 10,
+    marginBottom: 4,
+  },
+  accentBar: { height: 3, marginBottom: Spacing.three },
+  modalScroll: { paddingHorizontal: Spacing.four, paddingBottom: Spacing.three, gap: Spacing.three },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  badgeDot: { width: 7, height: 7, borderRadius: 3.5 },
+  modalTitle: { lineHeight: 36 },
+  modalDescription: { lineHeight: 20 },
+  metaCard: {
+    borderRadius: Spacing.three,
+    padding: Spacing.three,
+    gap: 0,
+  },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, paddingVertical: Spacing.two },
+  metaDivider: { height: 1, marginHorizontal: 0 },
+  metaIcon: { fontSize: 18, width: 28, textAlign: 'center' },
+  metaBody: { flex: 1, gap: 2 },
+  actions: { gap: Spacing.two, marginTop: Spacing.one },
+  joinBtn: {
+    borderRadius: Spacing.two + 2,
+    paddingVertical: Spacing.three - 2,
+    alignItems: 'center',
+  },
+  joinBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  calendarBtn: {
+    borderRadius: Spacing.two + 2,
+    paddingVertical: Spacing.three - 2,
+    alignItems: 'center',
+    borderWidth: 1.5,
+  },
+  calendarBtnText: { fontSize: 15, fontWeight: '600' },
+  closeBtn: {
+    alignItems: 'center',
+    paddingVertical: Spacing.two,
+    marginTop: Spacing.one,
   },
 });

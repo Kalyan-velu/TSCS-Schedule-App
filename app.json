@@ -1,4 +1,4 @@
-{
+ {
   "expo": {
     "name": "TSCS-App",
     "slug": "TSCS-App",
@@ -33,6 +33,13 @@
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76
           }
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "The app needs to add classes to your calendar.",
+          "remindersPermission": "The app needs to set reminders for your classes."
         }
       ]
     ],
