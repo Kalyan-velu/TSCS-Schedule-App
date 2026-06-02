@@ -8,29 +8,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33fa88d5-a9f8-4368-b0fc-958f501ee660" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/TSCS-App.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TSCS-App.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/awsToolkit.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/git_toolbox_prj.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AGENTS.md" beforeDir="false" afterPath="$PROJECT_DIR$/AGENTS.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/_layout.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/notifications.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/notifications.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/schedule.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/schedule.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/app-tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/app-tabs.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/app-tabs.web.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/app-tabs.web.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/global.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/global.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/use-week-events.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/use-week-events.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/api.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/event-utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/event-utils.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="repository" />
+    </option>
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
@@ -38,77 +35,83 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="88" />
+    <option name="cachedIndexableFilesCount" value="90" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myAllFileTypesSelected" value="true" />
+    <option name="mySelectedFileTypes">
+      <set />
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
-}]]></component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.0000000000000002" />
-      <entry key="S30" value="1.000015303089777" />
-      <entry key="S60" value="1.0092402966647733" />
-      <entry key="M2" value="1.280309245404656" />
-      <entry key="M5" value="3.9170320123947624" />
-      <entry key="M10" value="7.89602217177792" />
-      <entry key="M15" value="10.273292999851796" />
-      <entry key="M30" value="13.527621313141065" />
-      <entry key="H1" value="15.632338907955445" />
-      <entry key="H2" value="18.19745982378281" />
-      <entry key="H4" value="25.445338068527764" />
-      <entry key="D1" value="51.69472074369986" />
-      <entry key="W1" value="61.18226802545181" />
+      <entry key="MS100" value="1.0000669555964325" />
+      <entry key="MS500" value="1.4374824312059569" />
+      <entry key="S2" value="4.831705651724714" />
+      <entry key="S5" value="7.342706078256917" />
+      <entry key="S10" value="8.9746095166952" />
+      <entry key="S30" value="17.066771365764666" />
+      <entry key="S60" value="25.31621231757339" />
+      <entry key="M2" value="33.34186129005304" />
+      <entry key="M5" value="57.4073973342517" />
+      <entry key="M10" value="95.65500281560497" />
+      <entry key="M15" value="121.54121439522737" />
+      <entry key="M30" value="160.94185362850297" />
+      <entry key="H1" value="188.361714450855" />
+      <entry key="H2" value="205.8888124536569" />
+      <entry key="H4" value="221.0858231349759" />
+      <entry key="D1" value="254.8043495079973" />
+      <entry key="W1" value="265.8958156430087" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="4.824869736858601E-21" />
-      <entry key="MS500" value="8.643648914883687E-5" />
-      <entry key="S2" value="0.09642158797383449" />
-      <entry key="S5" value="0.39234643594364443" />
-      <entry key="S10" value="0.6263756348579058" />
-      <entry key="S30" value="0.8556147943536364" />
-      <entry key="S60" value="0.9249944834179481" />
-      <entry key="M2" value="0.9617663351448458" />
-      <entry key="M5" value="0.9845274480762021" />
-      <entry key="M10" value="0.9922335652840022" />
-      <entry key="M15" value="0.9948156516730565" />
-      <entry key="M30" value="0.9974055491484062" />
-      <entry key="H1" value="0.9997462458470422" />
-      <entry key="H2" value="1.0316747813330278" />
-      <entry key="H4" value="1.1794647860654672" />
-      <entry key="D1" value="1.7512124785164762" />
-      <entry key="W1" value="1.9599592544699762" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="6.835810036722497E-214" />
+      <entry key="S5" value="5.4189606099560906E-86" />
+      <entry key="S10" value="2.3278661065353625E-43" />
+      <entry key="S30" value="6.151570406933089E-15" />
+      <entry key="S60" value="7.843194761659965E-8" />
+      <entry key="M2" value="2.800570435047112E-4" />
+      <entry key="M5" value="0.03792264319569328" />
+      <entry key="M10" value="0.19473736979761536" />
+      <entry key="M15" value="0.3359692526540538" />
+      <entry key="M30" value="0.5796291815812646" />
+      <entry key="H1" value="0.7621299222241626" />
+      <entry key="H2" value="0.9007669229513579" />
+      <entry key="H4" value="1.1020969155235083" />
+      <entry key="D1" value="1.7315218562118189" />
+      <entry key="W1" value="1.9567957242199219" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.612479644956678E-10" />
-      <entry key="MS500" value="0.011003415034822635" />
-      <entry key="S2" value="0.35306058826669307" />
-      <entry key="S5" value="0.8802802181737228" />
-      <entry key="S10" value="1.2913513057038066" />
-      <entry key="S30" value="1.717706104789935" />
-      <entry key="S60" value="1.861175685167348" />
-      <entry key="M2" value="2.2020773245563925" />
-      <entry key="M5" value="4.868280524170565" />
-      <entry key="M10" value="8.856215452525174" />
-      <entry key="M15" value="11.24030373648757" />
-      <entry key="M30" value="14.506613049666369" />
-      <entry key="H1" value="16.62142454537038" />
-      <entry key="H2" value="19.223298857884902" />
-      <entry key="H4" value="26.62155433044005" />
-      <entry key="D1" value="53.445234442443926" />
-      <entry key="W1" value="63.142119706032545" />
+      <entry key="MS100" value="0.9330943946149911" />
+      <entry key="MS500" value="1.4152881851951402" />
+      <entry key="S2" value="4.809604594179763" />
+      <entry key="S5" value="7.328987362864165" />
+      <entry key="S10" value="8.966010845441435" />
+      <entry key="S30" value="17.060384578234736" />
+      <entry key="S60" value="25.3111767381802" />
+      <entry key="M2" value="33.3387137593175" />
+      <entry key="M5" value="57.44150665561878" />
+      <entry key="M10" value="95.84114517317626" />
+      <entry key="M15" value="121.86576640589674" />
+      <entry key="M30" value="161.50939337876235" />
+      <entry key="H1" value="189.11489366510767" />
+      <entry key="H2" value="206.78403389744213" />
+      <entry key="H4" value="222.18464909040114" />
+      <entry key="D1" value="256.5351396635955" />
+      <entry key="W1" value="267.85249810319135" />
     </decayedShown>
   </component>
   <component name="OptimizeOnSaveOptions">
@@ -145,7 +148,7 @@
     "nodejs_package_manager_path": "pnpm",
     "npm.android.executor": "Run",
     "npm.web.executor": "Run",
-    "settings.editor.selected.configurable": "actions.on.save",
+    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
     "show.migrate.to.gradle.popup": "false",
     "to.speed.mode.migration.done": "true",
     "ts.external.directory.path": "E:\\TSCS-App\\node_modules\\typescript\\lib",
@@ -161,7 +164,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="npm.web">
+  <component name="RunManager" selected="npm.android">
     <configuration name="android" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -184,8 +187,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.web" />
         <item itemvalue="npm.android" />
+        <item itemvalue="npm.web" />
       </list>
     </recent_temporary>
   </component>
@@ -208,6 +211,7 @@
       <workItem from="1780177247120" duration="3494000" />
       <workItem from="1780215390009" duration="7763000" />
       <workItem from="1780304353638" duration="1642000" />
+      <workItem from="1780387305129" duration="1942000" />
     </task>
     <servers />
   </component>

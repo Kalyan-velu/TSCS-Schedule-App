@@ -8,31 +8,13 @@ import {ThemedView} from '@/components/themed-view';
 import {BottomTabInset, Spacing} from '@/constants/theme';
 import {useWeekEvents} from '@/hooks/use-week-events';
 import {useNotificationsStore} from '@/store/notifications-store';
-import {type ClassItem, formatTime, handleJoinMeeting} from '@/lib/event-utils';
+import { formatTime, getHighlightClass, handleJoinMeeting, isToday, type ClassItem } from '@/lib/event-utils';
 
 function getGreeting() {
   const h = new Date().getHours();
   if (h < 12) return 'Good Morning';
   if (h < 17) return 'Good Afternoon';
   return 'Good Evening';
-}
-
-function isToday(date: Date): boolean {
-  const today = new Date();
-  return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  );
-}
-
-function getHighlightClass(classes: ClassItem[]) {
-  const now = new Date();
-  const sorted = [...classes].sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
-  const ongoing = sorted.find((cls) => now >= cls.startDate && now <= cls.endDate);
-  if (ongoing) return { current: ongoing, isOngoing: true };
-  const next = sorted.find((cls) => cls.startDate > now);
-  return { current: next ?? null, isOngoing: false };
 }
 
 type UpcomingRowProps = { item: ClassItem; onPress: () => void };
