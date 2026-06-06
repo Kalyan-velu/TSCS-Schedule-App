@@ -1,13 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchBatch, fetchStudents } from '@/lib/api';
+import { fetchBatch, fetchStudent } from '@/lib/api';
+import { useAuthStore } from '@/store/auth-store';
 
 export function useProfile() {
-  const studentsQuery = useQuery({
-    queryKey: ['students'],
-    queryFn: fetchStudents,
+  const currentStudent = useAuthStore((s) => s.student);
+
+  const studentQuery = useQuery({
+    queryKey: ['student', currentStudent?.id],
+    queryFn: () => fetchStudent(currentStudent!.id),
+    enabled: !!currentStudent?.id,
   });
 
-  const student = studentsQuery.data?.[0] ?? null;
+  const student = studentQuery.data ?? currentStudent;
 
   const batchQuery = useQuery({
     queryKey: ['batch', student?.batchId],
@@ -18,7 +22,7 @@ export function useProfile() {
   return {
     student,
     batch: batchQuery.data ?? null,
-    loading: studentsQuery.isLoading,
-    error: studentsQuery.error ? (studentsQuery.error as Error).message : null,
+    loading: studentQuery.isLoading,
+    error: studentQuery.error ? (studentQuery.error as Error).message : null,
   };
 }

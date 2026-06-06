@@ -8,6 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { useProfile } from '@/hooks/use-profile';
 import { useWeekEvents } from '@/hooks/use-week-events';
 import {
   DAYS, DAY_BY_INDEX,
@@ -19,7 +20,13 @@ import { useScheduleStore } from '@/store/schedule-store';
 
 export default function ScheduleScreen() {
   const { selectedDay, setSelectedDay, weekOffset, setWeekOffset } = useScheduleStore();
-  const { events, loading, error } = useWeekEvents(weekOffset);
+  const { student, loading: profileLoading, error: profileError } = useProfile();
+  const batchId = student?.batchId;
+  const { events, loading: eventsLoading, error: eventsError } = useWeekEvents(weekOffset, batchId);
+
+  const loading = profileLoading || (!!batchId && eventsLoading);
+  const error = profileError || eventsError;
+
   const theme = useTheme();
   const todayDayIndex = getTodayDayIndex();
 
@@ -70,110 +77,128 @@ export default function ScheduleScreen() {
       {/* ── Header ── */}
       <ThemedView style={styles.header}>
         <ThemedText type="subtitle">Schedule</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">{selectedDateLabel}</ThemedText>
+        {!loading && !error && batchId && (
+          <ThemedText type="small" themeColor="textSecondary">{selectedDateLabel}</ThemedText>
+        )}
       </ThemedView>
 
-      {/* ── Week navigation ── */}
-      <View style={styles.weekNav}>
-        <TouchableOpacity
-          onPress={() => setWeekOffset(weekOffset - 1)}
-          style={[styles.weekNavBtn, { backgroundColor: theme.backgroundElement }]}
-          activeOpacity={0.7}>
-          <ThemedText style={styles.weekNavArrow}>‹</ThemedText>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => { setWeekOffset(0); setSelectedDay(getTodayDayIndex()); }}
-          activeOpacity={0.8}>
-          <ThemedText type="smallBold" style={styles.weekLabel}>{weekLabel}</ThemedText>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setWeekOffset(weekOffset + 1)}
-          style={[styles.weekNavBtn, { backgroundColor: theme.backgroundElement }]}
-          activeOpacity={0.7}>
-          <ThemedText style={styles.weekNavArrow}>›</ThemedText>
-        </TouchableOpacity>
-      </View>
-
-      {/* ── Day picker ── */}
-      <ThemedView type="backgroundElement" style={styles.dayPicker}>
-        {DAYS.map((day, i) => {
-          const isSelected = selectedDay === i;
-          const isToday = todayInThisWeek && todayDayIndex === i;
-          const dayDate = dateForDayIndex(weekStart, i);
-          const dayNumber = dayDate.getDate();
-
-          return (
-            <TouchableOpacity
-              key={day}
-              onPress={() => handleDayPress(i)}
-              style={[styles.dayBtn, isSelected && { backgroundColor: theme.text }]}
-              activeOpacity={0.7}>
-              <ThemedText
-                type="smallBold"
-                style={[
-                  styles.dayBtnLabel,
-                  isSelected ? { color: theme.background } : undefined,
-                ]}
-                themeColor={isSelected ? undefined : 'textSecondary'}>
-                {isToday ? 'Today' : day}
-              </ThemedText>
-              <ThemedText
-                type="small"
-                style={[
-                  styles.dayNumber,
-                  { color: isSelected ? theme.background : theme.textSecondary },
-                ]}>
-                {dayNumber}
-              </ThemedText>
-              {isToday && (
-                <View
-                  style={[
-                    styles.todayDot,
-                    { backgroundColor: isSelected ? theme.background : '#3c87f7' },
-                  ]}
-                />
-              )}
-            </TouchableOpacity>
-          );
-        })}
-      </ThemedView>
-
-      {/* ── Classes list ── */}
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: BottomTabInset + Spacing.three },
-        ]}
-        showsVerticalScrollIndicator={false}>
-        {loading ? (
-          <View style={styles.loadingState}>
-            <ActivityIndicator />
-          </View>
-        ) : error ? (
+      {loading ? (
+        <View style={styles.loadingState}>
+          <ActivityIndicator />
+        </View>
+      ) : error ? (
+        <View style={styles.contentPadding}>
           <ThemedView type="backgroundElement" style={styles.emptyState}>
             <ThemedText type="default" themeColor="textSecondary">
               Could not load schedule
             </ThemedText>
           </ThemedView>
-        ) : classes.length === 0 ? (
-          <ThemedView type="backgroundElement" style={styles.emptyState}>
-            <ThemedText type="default" themeColor="textSecondary">
-              No classes scheduled
+        </View>
+      ) : !batchId ? (
+        <View style={styles.contentPadding}>
+          <ThemedView type="backgroundElement" style={styles.noBatchCard}>
+            <ThemedText style={styles.noBatchEmoji}>🎒</ThemedText>
+            <ThemedText type="smallBold" style={styles.noBatchTitle}>No Batch Assigned</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.noBatchDesc}>
+              You are not currently enrolled in any batch. Please contact your administrator to view your schedule.
             </ThemedText>
           </ThemedView>
-        ) : (
-          classes.map((cls) => (
-            <ClassCard
-              key={cls.id}
-              item={cls}
-              onPress={() => setSelectedEvent(cls)}
-            />
-          ))
-        )}
-      </ScrollView>
+        </View>
+      ) : (
+        <>
+          {/* ── Week navigation ── */}
+          <View style={styles.weekNav}>
+            <TouchableOpacity
+              onPress={() => setWeekOffset(weekOffset - 1)}
+              style={[styles.weekNavBtn, { backgroundColor: theme.backgroundElement }]}
+              activeOpacity={0.7}>
+              <ThemedText style={styles.weekNavArrow}>‹</ThemedText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => { setWeekOffset(0); setSelectedDay(getTodayDayIndex()); }}
+              activeOpacity={0.8}>
+              <ThemedText type="smallBold" style={styles.weekLabel}>{weekLabel}</ThemedText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setWeekOffset(weekOffset + 1)}
+              style={[styles.weekNavBtn, { backgroundColor: theme.backgroundElement }]}
+              activeOpacity={0.7}>
+              <ThemedText style={styles.weekNavArrow}>›</ThemedText>
+            </TouchableOpacity>
+          </View>
+
+          {/* ── Day picker ── */}
+          <ThemedView type="backgroundElement" style={styles.dayPicker}>
+            {DAYS.map((day, i) => {
+              const isSelected = selectedDay === i;
+              const isToday = todayInThisWeek && todayDayIndex === i;
+              const dayDate = dateForDayIndex(weekStart, i);
+              const dayNumber = dayDate.getDate();
+
+              return (
+                <TouchableOpacity
+                  key={day}
+                  onPress={() => handleDayPress(i)}
+                  style={[styles.dayBtn, isSelected && { backgroundColor: theme.text }]}
+                  activeOpacity={0.7}>
+                  <ThemedText
+                    type="smallBold"
+                    style={[
+                      styles.dayBtnLabel,
+                      isSelected ? { color: theme.background } : undefined,
+                    ]}
+                    themeColor={isSelected ? undefined : 'textSecondary'}>
+                    {isToday ? 'Today' : day}
+                  </ThemedText>
+                  <ThemedText
+                    type="small"
+                    style={[
+                      styles.dayNumber,
+                      { color: isSelected ? theme.background : theme.textSecondary },
+                    ]}>
+                    {dayNumber}
+                  </ThemedText>
+                  {isToday && (
+                    <View
+                      style={[
+                        styles.todayDot,
+                        { backgroundColor: isSelected ? theme.background : '#3c87f7' },
+                      ]}
+                    />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </ThemedView>
+
+          {/* ── Classes list ── */}
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={[
+              styles.scrollContent,
+              { paddingBottom: BottomTabInset + Spacing.three },
+            ]}
+            showsVerticalScrollIndicator={false}>
+            {classes.length === 0 ? (
+              <ThemedView type="backgroundElement" style={styles.emptyState}>
+                <ThemedText type="default" themeColor="textSecondary">
+                  No classes scheduled
+                </ThemedText>
+              </ThemedView>
+            ) : (
+              classes.map((cls) => (
+                <ClassCard
+                  key={cls.id}
+                  item={cls}
+                  onPress={() => setSelectedEvent(cls)}
+                />
+              ))
+            )}
+          </ScrollView>
+        </>
+      )}
 
       {/* ── Event detail drawer ── */}
       <EventDrawer
@@ -243,5 +268,31 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     alignItems: 'center',
   },
-
+  contentPadding: {
+    paddingHorizontal: Spacing.three,
+  },
+  noBatchCard: {
+    borderRadius: Spacing.four,
+    padding: Spacing.six,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.two,
+    marginTop: Spacing.four,
+    borderWidth: 1,
+    borderColor: '#88888820',
+  },
+  noBatchEmoji: {
+    fontSize: 48,
+    marginBottom: Spacing.one,
+  },
+  noBatchTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  noBatchDesc: {
+    textAlign: 'center',
+    lineHeight: 20,
+    paddingHorizontal: Spacing.two,
+  },
 });

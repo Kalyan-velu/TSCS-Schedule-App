@@ -10,11 +10,12 @@ function toSortedClassItems(raw: Awaited<ReturnType<typeof fetchEvents>>): Class
     .map(toClassItem);
 }
 
-export function useWeekEvents(weekOffset = 0) {
+export function useWeekEvents(weekOffset = 0, batchId?: string | null) {
   const { from, to } = getWeekRange(weekOffset);
   const { data = [], isLoading, error } = useQuery({
-    queryKey: ['events', 'week', from, to],
-    queryFn: () => fetchEvents({ from, to }).then(toSortedClassItems),
+    queryKey: ['events', 'week', from, to, batchId],
+    queryFn: () => fetchEvents({ from, to, batchId: batchId || undefined }).then(toSortedClassItems),
+    enabled: !!batchId,
   });
   return { events: data, loading: isLoading, error: error ? (error as Error).message : null };
 }

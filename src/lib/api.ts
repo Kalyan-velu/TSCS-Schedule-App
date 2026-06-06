@@ -69,3 +69,20 @@ export function fetchStudents(): Promise<Student[]> {
 export function fetchStudent(studentId: string): Promise<Student> {
   return apiFetch<Student>(`/student/${studentId}`);
 }
+
+export type LoginResponse = {
+  token: string;
+  student: Student;
+};
+
+export async function loginStudent(credentials: { email: string; password?: string }): Promise<LoginResponse> {
+  const res = await fetch(`${BASE_URL}/student/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json: ApiResponse<LoginResponse> = await res.json();
+  if (!json.status) throw new Error(json.error.message);
+  return json.data;
+}

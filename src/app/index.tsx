@@ -7,6 +7,7 @@ import {ThemedText} from '@/components/themed-text';
 import {ThemedView} from '@/components/themed-view';
 import {BottomTabInset, Spacing} from '@/constants/theme';
 import {useWeekEvents} from '@/hooks/use-week-events';
+import {useProfile} from '@/hooks/use-profile';
 import {useNotificationsStore} from '@/store/notifications-store';
 import { formatTime, getHighlightClass, handleJoinMeeting, isToday, type ClassItem } from '@/lib/event-utils';
 
@@ -41,7 +42,13 @@ function UpcomingRow({ item, onPress }: UpcomingRowProps) {
 }
 
 export default function HomeScreen() {
-  const { events: allEvents, loading, error } = useWeekEvents();
+  const { student, loading: profileLoading, error: profileError } = useProfile();
+  const batchId = student?.batchId;
+  const { events: allEvents, loading: eventsLoading, error: eventsError } = useWeekEvents(0, batchId);
+
+  const loading = profileLoading || (!!batchId && eventsLoading);
+  const error = profileError || eventsError;
+
   const router = useRouter();
   const unreadCount = useNotificationsStore((s) => s.notifs.filter((n) => !n.read).length);
 
@@ -92,78 +99,96 @@ export default function HomeScreen() {
         </ThemedView>
 
         {/* Next / Ongoing Class */}
-        <ThemedText type="smallBold" style={styles.sectionTitle}>
-          {isOngoing ? 'LIVE NOW' : 'NEXT CLASS'}
-        </ThemedText>
-
         {loading ? (
-          <ThemedView type="backgroundElement" style={styles.loadingCard}>
-            <ActivityIndicator />
-          </ThemedView>
+          <>
+            <ThemedText type="smallBold" style={styles.sectionTitle}>NEXT CLASS</ThemedText>
+            <ThemedView type="backgroundElement" style={styles.loadingCard}>
+              <ActivityIndicator />
+            </ThemedView>
+          </>
         ) : error ? (
-          <ThemedView type="backgroundElement" style={styles.emptyCard}>
-            <ThemedText type="default" themeColor="textSecondary">Could not load schedule</ThemedText>
-          </ThemedView>
-        ) : !highlightClass ? (
-          <ThemedView type="backgroundElement" style={styles.emptyCard}>
-            <ThemedText type="default" themeColor="textSecondary">No more classes today</ThemedText>
+          <>
+            <ThemedText type="smallBold" style={styles.sectionTitle}>NEXT CLASS</ThemedText>
+            <ThemedView type="backgroundElement" style={styles.emptyCard}>
+              <ThemedText type="default" themeColor="textSecondary">Could not load schedule</ThemedText>
+            </ThemedView>
+          </>
+        ) : !batchId ? (
+          <ThemedView type="backgroundElement" style={styles.noBatchCard}>
+            <ThemedText style={styles.noBatchEmoji}>🎒</ThemedText>
+            <ThemedText type="smallBold" style={styles.noBatchTitle}>No Batch Assigned</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.noBatchDesc}>
+              You are not currently enrolled in any batch. Please contact your administrator to get assigned to a batch.
+            </ThemedText>
           </ThemedView>
         ) : (
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() => router.push(`/class/${highlightClass.id}`)}>
-            <ThemedView
-              type="backgroundElement"
-              style={styles.heroCard}>
-              <View style={styles.heroBadgeRow}>
-                <View style={[styles.liveBadge, { backgroundColor: (isOngoing ? '#FF3B30' : highlightClass.color) + '20' }]}>
-                  <View style={[styles.liveDot, { backgroundColor: isOngoing ? '#FF3B30' : highlightClass.color }]} />
-                  <ThemedText
-                    type="smallBold"
-                    style={{ color: isOngoing ? '#FF3B30' : highlightClass.color, fontSize: 11, letterSpacing: 0.8 }}>
-                    {isOngoing ? 'LIVE' : 'UPCOMING'}
-                  </ThemedText>
-                </View>
-              </View>
-              <ThemedText type="subtitle" style={styles.heroTitle}>{highlightClass.subject}</ThemedText>
-              {!!highlightClass.description && (
-                <ThemedText type="small" themeColor="textSecondary">{highlightClass.description}</ThemedText>
-              )}
-              <View style={styles.heroMeta}>
-                <View style={[styles.timePill, { backgroundColor: highlightClass.color + '20' }]}>
-                  <ThemedText type="smallBold" style={{ color: highlightClass.color, fontSize: 13 }}>
-                    {formatTime(highlightClass.startTime)} – {formatTime(highlightClass.endTime)}
-                  </ThemedText>
-                </View>
-                {highlightClass.meetLink && (
-                  <TouchableOpacity
-                    style={[styles.joinBtn, { backgroundColor: '#FF3B30' }]}
-                    onPress={(e) => {
-                      e.stopPropagation?.();
-                      handleJoinMeeting(highlightClass.meetLink!);
-                    }}
-                    activeOpacity={0.85}>
-                    <ThemedText style={styles.joinBtnText}>▶  Join Live</ThemedText>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </ThemedView>
-          </TouchableOpacity>
-        )}
-
-        {/* Today's Upcoming */}
-        {!loading && !error && upcomingClasses.length > 0 && (
           <>
-            <ThemedText type="smallBold" style={styles.sectionTitle}>TODAY'S UPCOMING</ThemedText>
-            <View style={styles.upcomingList}>
-              {upcomingClasses.map((cls) => (
-                <UpcomingRow
-                  key={cls.id}
-                  item={cls}
-                  onPress={() => router.push(`/class/${cls.id}`)}
-                />
-              ))}
-            </View>
+            <ThemedText type="smallBold" style={styles.sectionTitle}>
+              {isOngoing ? 'LIVE NOW' : 'NEXT CLASS'}
+            </ThemedText>
+
+            {!highlightClass ? (
+              <ThemedView type="backgroundElement" style={styles.emptyCard}>
+                <ThemedText type="default" themeColor="textSecondary">No more classes today</ThemedText>
+              </ThemedView>
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={() => router.push(`/class/${highlightClass.id}`)}>
+                <ThemedView
+                  type="backgroundElement"
+                  style={styles.heroCard}>
+                  <View style={styles.heroBadgeRow}>
+                    <View style={[styles.liveBadge, { backgroundColor: (isOngoing ? '#FF3B30' : highlightClass.color) + '20' }]}>
+                      <View style={[styles.liveDot, { backgroundColor: isOngoing ? '#FF3B30' : highlightClass.color }]} />
+                      <ThemedText
+                        type="smallBold"
+                        style={{ color: isOngoing ? '#FF3B30' : highlightClass.color, fontSize: 11, letterSpacing: 0.8 }}>
+                        {isOngoing ? 'LIVE' : 'UPCOMING'}
+                      </ThemedText>
+                    </View>
+                  </View>
+                  <ThemedText type="subtitle" style={styles.heroTitle}>{highlightClass.subject}</ThemedText>
+                  {!!highlightClass.description && (
+                    <ThemedText type="small" themeColor="textSecondary">{highlightClass.description}</ThemedText>
+                  )}
+                  <View style={styles.heroMeta}>
+                    <View style={[styles.timePill, { backgroundColor: highlightClass.color + '20' }]}>
+                      <ThemedText type="smallBold" style={{ color: highlightClass.color, fontSize: 13 }}>
+                        {formatTime(highlightClass.startTime)} – {formatTime(highlightClass.endTime)}
+                      </ThemedText>
+                    </View>
+                    {highlightClass.meetLink && (
+                      <TouchableOpacity
+                        style={[styles.joinBtn, { backgroundColor: '#FF3B30' }]}
+                        onPress={(e) => {
+                          e.stopPropagation?.();
+                          handleJoinMeeting(highlightClass.meetLink!);
+                        }}
+                        activeOpacity={0.85}>
+                        <ThemedText style={styles.joinBtnText}>▶  Join Live</ThemedText>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </ThemedView>
+              </TouchableOpacity>
+            )}
+
+            {/* Today's Upcoming */}
+            {upcomingClasses.length > 0 && (
+              <>
+                <ThemedText type="smallBold" style={styles.sectionTitle}>TODAY'S UPCOMING</ThemedText>
+                <View style={styles.upcomingList}>
+                  {upcomingClasses.map((cls) => (
+                    <UpcomingRow
+                      key={cls.id}
+                      item={cls}
+                      onPress={() => router.push(`/class/${cls.id}`)}
+                    />
+                  ))}
+                </View>
+              </>
+            )}
           </>
         )}
 
@@ -199,4 +224,28 @@ const styles = StyleSheet.create({
   upcomingRow: { flexDirection: 'row', alignItems: 'center', padding: Spacing.three, borderRadius: Spacing.three, gap: Spacing.three },
   upcomingDot: { width: 10, height: 10, borderRadius: 5, flexShrink: 0 },
   upcomingBody: { flex: 1, gap: Spacing.half },
+  noBatchCard: {
+    borderRadius: Spacing.four,
+    padding: Spacing.six,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.two,
+    marginTop: Spacing.four,
+    borderWidth: 1,
+    borderColor: '#88888820',
+  },
+  noBatchEmoji: {
+    fontSize: 48,
+    marginBottom: Spacing.one,
+  },
+  noBatchTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  noBatchDesc: {
+    textAlign: 'center',
+    lineHeight: 20,
+    paddingHorizontal: Spacing.two,
+  },
 });
