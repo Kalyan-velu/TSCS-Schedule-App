@@ -1,6 +1,6 @@
-import { Linking, Platform } from 'react-native';
+import {Linking, Platform} from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
-import type { Event as ApiEvent } from '@/lib/api';
+import type {Event as ApiEvent} from '@/lib/api';
 
 export type ClassItem = {
   id: string;
@@ -60,14 +60,14 @@ export async function handleJoinMeeting(url: string): Promise<void> {
 export async function addEventToCalendar(item: ClassItem): Promise<void> {
   const fmtGcal = (d: Date) =>
     d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-
+  
   const gcalUrl =
     `https://calendar.google.com/calendar/render?action=TEMPLATE` +
     `&text=${encodeURIComponent(item.subject)}` +
     `&dates=${fmtGcal(item.startDate)}/${fmtGcal(item.endDate)}` +
     `&details=${encodeURIComponent(item.description ?? '')}` +
     (item.meetLink ? `&location=${encodeURIComponent(item.meetLink)}` : '');
-
+  
   if (Platform.OS === 'ios') {
     const APPLE_EPOCH_OFFSET = 978307200;
     const ts = Math.floor(item.startDate.getTime() / 1000) - APPLE_EPOCH_OFFSET;
@@ -76,7 +76,7 @@ export async function addEventToCalendar(item: ClassItem): Promise<void> {
     await Linking.openURL(canOpen ? calUrl : gcalUrl);
     return;
   }
-
+  
   if (Platform.OS === 'android') {
     const startMs = item.startDate.getTime();
     const endMs = item.endDate.getTime();
@@ -90,11 +90,10 @@ export async function addEventToCalendar(item: ClassItem): Promise<void> {
     await Linking.openURL(canOpen ? intentUrl : gcalUrl);
     return;
   }
-
+  
   await Linking.openURL(gcalUrl);
 }
 
-/* ── Week / day helpers ─────────────────────────────────────── */
 
 export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 export type Day = (typeof DAYS)[number];
@@ -128,7 +127,7 @@ export function getWeekRange(weekOffset = 0) {
   const sun = new Date(mon);
   sun.setDate(mon.getDate() + 6);
   sun.setHours(23, 59, 59, 999);
-  return { from: mon.toISOString(), to: sun.toISOString(), weekStart: mon };
+  return {from: mon.toISOString(), to: sun.toISOString(), weekStart: mon};
 }
 
 /* ── Class selection helpers ────────────────────────────────── */
@@ -147,7 +146,7 @@ export function getHighlightClass(classes: ClassItem[]): { current: ClassItem | 
   const now = new Date();
   const sorted = [...classes].sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
   const ongoing = sorted.find((cls) => now >= cls.startDate && now <= cls.endDate);
-  if (ongoing) return { current: ongoing, isOngoing: true };
+  if (ongoing) return {current: ongoing, isOngoing: true};
   const next = sorted.find((cls) => cls.startDate > now);
-  return { current: next ?? null, isOngoing: false };
+  return {current: next ?? null, isOngoing: false};
 }

@@ -33,7 +33,6 @@ function SettingsRow({emoji, label, danger = false, onPress}: SettingsRowProps) 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7} disabled={!onPress}>
       <ThemedView style={styles.settingsRow}>
-        <ThemedText style={styles.settingsEmoji}>{emoji}</ThemedText>
         <ThemedText
           type="default"
           style={[styles.settingsLabel, danger && styles.settingsDanger]}>
@@ -100,20 +99,18 @@ export default function ProfileScreen() {
               </View>
             </ThemedView>
             
-            {/* Stats */}
-            <View style={styles.statsRow}>
-              <Stat value="92%" label="Attendance"/>
-              <Stat value="5" label="Courses"/>
-              <Stat value="3" label="Pending"/>
-            </View>
+            {/*/!* Stats *!/*/}
+            {/*<View style={styles.statsRow}>*/}
+            {/*  <Stat value="92%" label="Attendance"/>*/}
+            {/*  <Stat value="5" label="Courses"/>*/}
+            {/*  <Stat value="3" label="Pending"/>*/}
+            {/*</View>*/}
             
             {/* Settings */}
             <ThemedView type="backgroundElement" style={styles.settingsCard}>
               <SettingsRow emoji="✏️" label="Edit Profile"/>
               <View style={styles.divider}/>
               <SettingsRow emoji="🔔" label="Notifications" onPress={() => router.push('/notifications')}/>
-              <View style={styles.divider}/>
-              <SettingsRow emoji="⬇" label="Downloads"/>
               <View style={styles.divider}/>
               <SettingsRow emoji="❓" label="Help & Support"/>
               <View style={styles.divider}/>
@@ -153,10 +150,17 @@ const styles = StyleSheet.create({
   statBox: {flex: 1, borderRadius: Spacing.three, padding: Spacing.three, alignItems: 'center', gap: Spacing.half},
   statValue: {fontSize: 24, lineHeight: 30},
   settingsCard: {borderRadius: Spacing.four, paddingHorizontal: Spacing.three, paddingVertical: Spacing.two},
-  settingsRow: {flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.three - 2, gap: Spacing.three},
+  settingsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: Spacing.three - 2,
+    paddingHorizontal: Spacing.four,
+    backgroundColor: 'transparent',
+    gap: Spacing.three
+  },
   settingsEmoji: {fontSize: 18, width: 28, textAlign: 'center'},
   settingsLabel: {flex: 1, fontSize: 16},
   settingsDanger: {color: '#FF3B30'},
   settingsChevron: {fontSize: 22, lineHeight: 22},
-  divider: {backgroundColor: '#88888830', marginLeft: Spacing.three + 28},
+  divider: {backgroundColor: '#8888881a', height: 1, marginLeft: Spacing.three},
 });

@@ -7,21 +7,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="33fa88d5-a9f8-4368-b0fc-958f501ee660" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/API_DOCUMENTATION.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.claude/API_REFERENCE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/TSCS-App.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TSCS-App.iml" afterDir="false" />
+    <list default="true" id="33fa88d5-a9f8-4368-b0fc-958f501ee660" name="Changes" comment="feat: implement student authentication and IDE setup&#10;&#10;- Added a dedicated login screen (`AuthScreen`) for student authentication.&#10;- Integrated a Zustand store for persistent management of student authentication state.&#10;- Enhanced `useWeekEvents` to fetch events specific to an authenticated student's batch.&#10;- Included IDE configuration files for Biome, Git Toolbox, JavaScript, Markdown, SQL, and Tailwind CSS.&#10;- Removed the outdated API reference document.&#10;- Updated ESLint configuration to ignore `dist/` directory.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-workspace.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-workspace.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/_layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/profile.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/schedule.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/schedule.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/use-profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/use-profile.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/use-week-events.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/use-week-events.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/app-tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/app-tabs.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/event-utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/event-utils.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,61 +55,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000000000000044" />
-      <entry key="MS500" value="1.0013507720986434" />
-      <entry key="S2" value="1.191710332459234" />
-      <entry key="S5" value="1.5164976228934541" />
-      <entry key="S10" value="1.7246743390295804" />
-      <entry key="S30" value="2.273760466845724" />
-      <entry key="S60" value="3.0113511548640433" />
-      <entry key="M2" value="3.760229289211844" />
-      <entry key="M5" value="4.428935704969739" />
-      <entry key="M10" value="4.7734290718074615" />
-      <entry key="M15" value="5.307686891374622" />
-      <entry key="M30" value="13.447932979397983" />
-      <entry key="H1" value="49.63026905270968" />
-      <entry key="H2" value="110.90743923006353" />
-      <entry key="H4" value="172.72335354539325" />
-      <entry key="D1" value="270.462049074318" />
-      <entry key="W1" value="297.0922869198151" />
+      <entry key="MS100" value="1.000000046441828" />
+      <entry key="MS500" value="1.0341493043469048" />
+      <entry key="S2" value="1.4298782431215034" />
+      <entry key="S5" value="1.71340836825267" />
+      <entry key="S10" value="1.8448169175844351" />
+      <entry key="S30" value="2.0642779547417662" />
+      <entry key="S60" value="2.8957038047634085" />
+      <entry key="M2" value="5.646161402525799" />
+      <entry key="M5" value="11.992280805767635" />
+      <entry key="M10" value="16.391197750964942" />
+      <entry key="M15" value="18.306662734278635" />
+      <entry key="M30" value="20.951435176394615" />
+      <entry key="H1" value="30.529007442592565" />
+      <entry key="H2" value="68.99062810504022" />
+      <entry key="H4" value="135.12348648835996" />
+      <entry key="D1" value="276.80138051002785" />
+      <entry key="W1" value="319.91202731831" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="0.0" />
-      <entry key="S10" value="3.3000143006816057E-298" />
-      <entry key="S30" value="6.910433212194966E-100" />
-      <entry key="S60" value="2.6287702851704074E-50" />
-      <entry key="M2" value="1.6213482923697827E-25" />
-      <entry key="M5" value="1.2132506352940726E-10" />
-      <entry key="M10" value="1.1014765704698721E-5" />
-      <entry key="M15" value="4.950512663697874E-4" />
-      <entry key="M30" value="0.02224977191142456" />
-      <entry key="H1" value="0.14931955038628233" />
-      <entry key="H2" value="0.3987092032150157" />
-      <entry key="H4" value="0.7332324925170844" />
-      <entry key="D1" value="1.617825328299556" />
-      <entry key="W1" value="1.9379016245647567" />
+      <entry key="MS100" value="2.2325498121892017E-46" />
+      <entry key="MS500" value="7.409010862511741E-10" />
+      <entry key="S2" value="0.005217230900901189" />
+      <entry key="S5" value="0.12217322437138725" />
+      <entry key="S10" value="0.3496317804330962" />
+      <entry key="S30" value="0.8197490565791716" />
+      <entry key="S60" value="1.6410290189405776" />
+      <entry key="M2" value="3.369961671611915" />
+      <entry key="M5" value="6.187172191550685" />
+      <entry key="M10" value="7.8092440019687" />
+      <entry key="M15" value="8.46687566574925" />
+      <entry key="M30" value="9.195042562889768" />
+      <entry key="H1" value="9.611953294987718" />
+      <entry key="H2" value="9.954099565597273" />
+      <entry key="H4" value="10.363974769045289" />
+      <entry key="D1" value="11.484203323543321" />
+      <entry key="W1" value="11.914894045700805" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.0030225878780124806" />
-      <entry key="MS500" value="0.3133832551140074" />
-      <entry key="S2" value="0.7496015179660624" />
-      <entry key="S5" value="0.9626308337964727" />
-      <entry key="S10" value="1.2182817895037703" />
-      <entry key="S30" value="2.003967651275489" />
-      <entry key="S60" value="2.858345008626384" />
-      <entry key="M2" value="3.678623970019087" />
-      <entry key="M5" value="4.394983453008299" />
-      <entry key="M10" value="4.756217222841161" />
-      <entry key="M15" value="5.296591953171642" />
-      <entry key="M30" value="13.463797544200167" />
-      <entry key="H1" value="49.77474505742123" />
-      <entry key="H2" value="111.30206964476214" />
-      <entry key="H4" value="173.4535650646629" />
-      <entry key="D1" value="272.07904366380654" />
-      <entry key="W1" value="299.0300551789446" />
+      <entry key="MS100" value="7.932152471883919E-4" />
+      <entry key="MS500" value="0.24677939308064997" />
+      <entry key="S2" value="0.9892748588211793" />
+      <entry key="S5" value="1.5272568345448267" />
+      <entry key="S10" value="1.938992472588739" />
+      <entry key="S30" value="2.730896833401735" />
+      <entry key="S60" value="4.414730147171773" />
+      <entry key="M2" value="8.907609992224971" />
+      <entry key="M5" value="18.10352292883421" />
+      <entry key="M10" value="24.152788027072233" />
+      <entry key="M15" value="26.739105760011924" />
+      <entry key="M30" value="30.12760468347524" />
+      <entry key="H1" value="40.130393808351535" />
+      <entry key="H2" value="78.93806970833526" />
+      <entry key="H4" value="145.4830048061736" />
+      <entry key="D1" value="288.284387808126" />
+      <entry key="W1" value="331.8267286067903" />
     </decayedShown>
   </component>
   <component name="OptimizeOnSaveOptions">
@@ -132,39 +125,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;24.13.0&quot;,
-    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;24.13.0&quot;,
-    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/TSCS-App&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
-    &quot;npm.android.executor&quot;: &quot;Run&quot;,
-    &quot;npm.start.executor&quot;: &quot;Run&quot;,
-    &quot;npm.web.executor&quot;: &quot;Run&quot;,
-    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AcpAgentsConfigurable&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;E:\\TSCS-App\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.nodejs.core.library.configured.version": "24.13.0",
+    "javascript.nodejs.core.library.typings.version": "24.13.0",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "E:/TSCS-App",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "npm.android.executor": "Run",
+    "npm.start.executor": "Run",
+    "npm.web.executor": "Run",
+    "rearrange.code.on.save": "true",
+    "settings.editor.selected.configurable": "ml.llm.mcp",
+    "show.migrate.to.gradle.popup": "false",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "E:\\TSCS-App\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="ReactDesignerToolWindowState">
     <option name="myId2Visible">
       <map>
@@ -183,7 +176,7 @@
       <recent name="E:\TSCS-App\.claude" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.start">
+  <component name="RunManager" selected="npm.android">
     <configuration name="android" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -216,8 +209,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.start" />
         <item itemvalue="npm.android" />
+        <item itemvalue="npm.start" />
         <item itemvalue="npm.web" />
       </list>
     </recent_temporary>
@@ -225,7 +218,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-6f3a0af6a84c-JavaScript-WS-262.6653.15" />
+        <option value="bundled-js-predefined-d6986cc7102b-6f3a0af6a84c-JavaScript-WS-262.7132.27" />
       </set>
     </attachedChunks>
   </component>
@@ -250,6 +243,11 @@
       <workItem from="1780571096610" duration="145000" />
       <workItem from="1780571252580" duration="3575000" />
       <workItem from="1780598756714" duration="2195000" />
+      <workItem from="1780735804141" duration="5980000" />
+      <workItem from="1780829994298" duration="4645000" />
+      <workItem from="1780907562586" duration="7413000" />
+      <workItem from="1780997047324" duration="4156000" />
+      <workItem from="1781090026283" duration="1669000" />
     </task>
     <task id="LOCAL-00001" summary="feat: add cross-platform EventDrawer component for event details&#10;&#10;- Implemented a reusable `EventDrawer` component with platform-specific versions for native and web.&#10;- Integrated the drawer into the Schedule screen, replacing the previous modal-based implementation.&#10;- Added event handling features, including &quot;Join Live Class&quot; and &quot;Add to Calendar&quot; actions with platform-optimized behavior.&#10;- Updated `event-utils` with shared event-related logic and platform-specific calendar integration.&#10;- Replaced redundant logic in Schedule and Home screens with newly extracted helpers from `event-utils`. &#10;- Installed `vaul` package as a dependency for the web drawer implementation.">
       <option name="closed" value="true" />
@@ -259,7 +257,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780389412537</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="feat: implement student authentication and IDE setup&#10;&#10;- Added a dedicated login screen (`AuthScreen`) for student authentication.&#10;- Integrated a Zustand store for persistent management of student authentication state.&#10;- Enhanced `useWeekEvents` to fetch events specific to an authenticated student's batch.&#10;- Included IDE configuration files for Biome, Git Toolbox, JavaScript, Markdown, SQL, and Tailwind CSS.&#10;- Removed the outdated API reference document.&#10;- Updated ESLint configuration to ignore `dist/` directory.">
+      <option name="closed" value="true" />
+      <created>1780737694387</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1780737694387</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -268,6 +274,7 @@
   <component name="VcsManagerConfiguration">
     <option name="MARK_IGNORED_AS_EXCLUDED" value="true" />
     <MESSAGE value="feat: add cross-platform EventDrawer component for event details&#10;&#10;- Implemented a reusable `EventDrawer` component with platform-specific versions for native and web.&#10;- Integrated the drawer into the Schedule screen, replacing the previous modal-based implementation.&#10;- Added event handling features, including &quot;Join Live Class&quot; and &quot;Add to Calendar&quot; actions with platform-optimized behavior.&#10;- Updated `event-utils` with shared event-related logic and platform-specific calendar integration.&#10;- Replaced redundant logic in Schedule and Home screens with newly extracted helpers from `event-utils`. &#10;- Installed `vaul` package as a dependency for the web drawer implementation." />
-    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <MESSAGE value="feat: implement student authentication and IDE setup&#10;&#10;- Added a dedicated login screen (`AuthScreen`) for student authentication.&#10;- Integrated a Zustand store for persistent management of student authentication state.&#10;- Enhanced `useWeekEvents` to fetch events specific to an authenticated student's batch.&#10;- Included IDE configuration files for Biome, Git Toolbox, JavaScript, Markdown, SQL, and Tailwind CSS.&#10;- Removed the outdated API reference document.&#10;- Updated ESLint configuration to ignore `dist/` directory." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: implement student authentication and IDE setup&#10;&#10;- Added a dedicated login screen (`AuthScreen`) for student authentication.&#10;- Integrated a Zustand store for persistent management of student authentication state.&#10;- Enhanced `useWeekEvents` to fetch events specific to an authenticated student's batch.&#10;- Included IDE configuration files for Biome, Git Toolbox, JavaScript, Markdown, SQL, and Tailwind CSS.&#10;- Removed the outdated API reference document.&#10;- Updated ESLint configuration to ignore `dist/` directory." />
   </component>
 </project>

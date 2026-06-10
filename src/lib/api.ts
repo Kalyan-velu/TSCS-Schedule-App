@@ -1,4 +1,4 @@
-const BASE_URL = 'http://192.168.1.7:8000';
+const BASE_URL = 'http://192.168.1.6:8000';
 
 export type Batch = {
   id: string;
@@ -78,7 +78,7 @@ export type LoginResponse = {
 export async function loginStudent(credentials: { email: string; password?: string }): Promise<LoginResponse> {
   const res = await fetch(`${BASE_URL}/student/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(credentials),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
