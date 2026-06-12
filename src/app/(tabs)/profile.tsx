@@ -78,7 +78,6 @@ export default function ProfileScreen() {
           </ThemedView>
         ) : (
           <>
-            {/* Avatar card */}
             <ThemedView type="backgroundElement" style={styles.avatarCard}>
               <View style={[styles.avatarCircle, {backgroundColor: avatarColor}]}>
                 <ThemedText style={styles.avatarInitials}>{getInitials(student.displayName)}</ThemedText>
@@ -99,14 +98,7 @@ export default function ProfileScreen() {
               </View>
             </ThemedView>
             
-            {/*/!* Stats *!/*/}
-            {/*<View style={styles.statsRow}>*/}
-            {/*  <Stat value="92%" label="Attendance"/>*/}
-            {/*  <Stat value="5" label="Courses"/>*/}
-            {/*  <Stat value="3" label="Pending"/>*/}
-            {/*</View>*/}
             
-            {/* Settings */}
             <ThemedView type="backgroundElement" style={styles.settingsCard}>
               <SettingsRow emoji="✏️" label="Edit Profile"/>
               <View style={styles.divider}/>

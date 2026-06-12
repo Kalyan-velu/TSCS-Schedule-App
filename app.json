@@ -1,4 +1,4 @@
- {
+{
   "expo": {
     "name": "TSCS-App",
     "slug": "TSCS-App",
@@ -6,8 +6,10 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tscsapp",
+    "jsEngine": "hermes",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "jsEngine": "jsc",
       "icon": "./assets/expo.icon"
     },
     "android": {

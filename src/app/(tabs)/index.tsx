@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 import {ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {useRouter} from 'expo-router';
+import {usePathname, useRouter} from 'expo-router';
 
 import {ScreenLayout} from '@/components/screen-layout';
 import {ThemedText} from '@/components/themed-text';
@@ -9,7 +9,7 @@ import {BottomTabInset, Spacing} from '@/constants/theme';
 import {useWeekEvents} from '@/hooks/use-week-events';
 import {useProfile} from '@/hooks/use-profile';
 import {useNotificationsStore} from '@/store/notifications-store';
-import { formatTime, getHighlightClass, handleJoinMeeting, isToday, type ClassItem } from '@/lib/event-utils';
+import {type ClassItem, formatTime, getHighlightClass, handleJoinMeeting, isToday} from '@/lib/event-utils';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -20,19 +20,19 @@ function getGreeting() {
 
 type UpcomingRowProps = { item: ClassItem; onPress: () => void };
 
-function UpcomingRow({ item, onPress }: UpcomingRowProps) {
+function UpcomingRow({item, onPress}: UpcomingRowProps) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.75}>
       <ThemedView type="backgroundElement" style={styles.upcomingRow}>
-        <View style={[styles.upcomingDot, { backgroundColor: item.color }]} />
+        <View style={[styles.upcomingDot, {backgroundColor: item.color}]}/>
         <View style={styles.upcomingBody}>
           <ThemedText type="smallBold" numberOfLines={1}>{item.subject}</ThemedText>
           {!!item.description && (
             <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{item.description}</ThemedText>
           )}
         </View>
-        <View style={[styles.timePill, { backgroundColor: item.color + '20' }]}>
-          <ThemedText type="smallBold" style={{ color: item.color, fontSize: 12 }}>
+        <View style={[styles.timePill, {backgroundColor: item.color + '20'}]}>
+          <ThemedText type="smallBold" style={{color: item.color, fontSize: 12}}>
             {formatTime(item.startTime)}
           </ThemedText>
         </View>
@@ -42,44 +42,46 @@ function UpcomingRow({ item, onPress }: UpcomingRowProps) {
 }
 
 export default function HomeScreen() {
-  const { student, loading: profileLoading, error: profileError } = useProfile();
+  const {student, loading: profileLoading, error: profileError} = useProfile();
   const batchId = student?.batchId;
-  const { events: allEvents, loading: eventsLoading, error: eventsError } = useWeekEvents(0, batchId);
-
+  const {events: allEvents, loading: eventsLoading, error: eventsError} = useWeekEvents(0, batchId);
+  
   const loading = profileLoading || (!!batchId && eventsLoading);
   const error = profileError || eventsError;
-
+  
   const router = useRouter();
+  const pathname = usePathname();
+  
+  console.log("Current route:", pathname);
   const unreadCount = useNotificationsStore((s) => s.notifs.filter((n) => !n.read).length);
-
+  
   const todayClasses = useMemo(
     () => allEvents.filter((cls) => isToday(cls.startDate)),
     [allEvents],
   );
-
-  const { current: highlightClass, isOngoing } = useMemo(
+  
+  const {current: highlightClass, isOngoing} = useMemo(
     () => getHighlightClass(todayClasses),
     [todayClasses],
   );
-
+  
   const upcomingClasses = useMemo(() => {
     const now = new Date();
     return todayClasses
       .filter((cls) => cls !== highlightClass && cls.startDate > now)
       .slice(0, 5);
   }, [todayClasses, highlightClass]);
-
+  
   const today = new Date().toLocaleDateString('en-IN', {
     weekday: 'long', month: 'long', day: 'numeric',
   });
-
+  
   return (
     <ScreenLayout>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: BottomTabInset + Spacing.three }]}>
-
-        {/* Header */}
+        contentContainerStyle={[styles.scrollContent, {paddingBottom: BottomTabInset + Spacing.three}]}>
+        
         <ThemedView style={styles.header}>
           <View>
             <ThemedText type="small" themeColor="textSecondary">{today}</ThemedText>
@@ -87,7 +89,13 @@ export default function HomeScreen() {
           </View>
           <TouchableOpacity
             style={styles.bellBtn}
-            onPress={() => router.push('/notifications')}
+            onPress={() => {
+              try {
+                router.push("/notifications");
+              } catch (error) {
+                console.error("Navigation error:", error);
+              }
+            }}
             activeOpacity={0.7}>
             <ThemedText style={styles.bellEmoji}>🔔</ThemedText>
             {unreadCount > 0 && (
@@ -97,13 +105,13 @@ export default function HomeScreen() {
             )}
           </TouchableOpacity>
         </ThemedView>
-
+        
         {/* Next / Ongoing Class */}
         {loading ? (
           <>
             <ThemedText type="smallBold" style={styles.sectionTitle}>NEXT CLASS</ThemedText>
             <ThemedView type="backgroundElement" style={styles.loadingCard}>
-              <ActivityIndicator />
+              <ActivityIndicator/>
             </ThemedView>
           </>
         ) : error ? (
@@ -126,7 +134,7 @@ export default function HomeScreen() {
             <ThemedText type="smallBold" style={styles.sectionTitle}>
               {isOngoing ? 'LIVE NOW' : 'NEXT CLASS'}
             </ThemedText>
-
+            
             {!highlightClass ? (
               <ThemedView type="backgroundElement" style={styles.emptyCard}>
                 <ThemedText type="default" themeColor="textSecondary">No more classes today</ThemedText>
@@ -139,11 +147,12 @@ export default function HomeScreen() {
                   type="backgroundElement"
                   style={styles.heroCard}>
                   <View style={styles.heroBadgeRow}>
-                    <View style={[styles.liveBadge, { backgroundColor: (isOngoing ? '#FF3B30' : highlightClass.color) + '20' }]}>
-                      <View style={[styles.liveDot, { backgroundColor: isOngoing ? '#FF3B30' : highlightClass.color }]} />
+                    <View
+                      style={[styles.liveBadge, {backgroundColor: (isOngoing ? '#FF3B30' : highlightClass.color) + '20'}]}>
+                      <View style={[styles.liveDot, {backgroundColor: isOngoing ? '#FF3B30' : highlightClass.color}]}/>
                       <ThemedText
                         type="smallBold"
-                        style={{ color: isOngoing ? '#FF3B30' : highlightClass.color, fontSize: 11, letterSpacing: 0.8 }}>
+                        style={{color: isOngoing ? '#FF3B30' : highlightClass.color, fontSize: 11, letterSpacing: 0.8}}>
                         {isOngoing ? 'LIVE' : 'UPCOMING'}
                       </ThemedText>
                     </View>
@@ -153,27 +162,27 @@ export default function HomeScreen() {
                     <ThemedText type="small" themeColor="textSecondary">{highlightClass.description}</ThemedText>
                   )}
                   <View style={styles.heroMeta}>
-                    <View style={[styles.timePill, { backgroundColor: highlightClass.color + '20' }]}>
-                      <ThemedText type="smallBold" style={{ color: highlightClass.color, fontSize: 13 }}>
+                    <View style={[styles.timePill, {backgroundColor: highlightClass.color + '20'}]}>
+                      <ThemedText type="smallBold" style={{color: highlightClass.color, fontSize: 13}}>
                         {formatTime(highlightClass.startTime)} – {formatTime(highlightClass.endTime)}
                       </ThemedText>
                     </View>
                     {highlightClass.meetLink && (
                       <TouchableOpacity
-                        style={[styles.joinBtn, { backgroundColor: '#FF3B30' }]}
+                        style={[styles.joinBtn, {backgroundColor: '#FF3B30'}]}
                         onPress={(e) => {
                           e.stopPropagation?.();
                           handleJoinMeeting(highlightClass.meetLink!);
                         }}
                         activeOpacity={0.85}>
-                        <ThemedText style={styles.joinBtnText}>▶  Join Live</ThemedText>
+                        <ThemedText style={styles.joinBtnText}>▶ Join Live</ThemedText>
                       </TouchableOpacity>
                     )}
                   </View>
                 </ThemedView>
               </TouchableOpacity>
             )}
-
+            
             {/* Today's Upcoming */}
             {upcomingClasses.length > 0 && (
               <>
@@ -191,39 +200,57 @@ export default function HomeScreen() {
             )}
           </>
         )}
-
+      
       </ScrollView>
     </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContent: { padding: Spacing.three, gap: Spacing.three },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: Spacing.one },
-  bellBtn: { position: 'relative', padding: Spacing.one },
-  bellEmoji: { fontSize: 22 },
+  scrollContent: {padding: Spacing.three, gap: Spacing.three},
+  header: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: Spacing.one},
+  bellBtn: {position: 'relative', padding: Spacing.one},
+  bellEmoji: {fontSize: 22},
   bellBadge: {
     position: 'absolute', top: 0, right: 0,
     backgroundColor: '#FF3B30', borderRadius: 8,
     minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3,
   },
-  bellBadgeText: { color: '#fff', fontSize: 10, fontWeight: '700' },
-  sectionTitle: { fontSize: 12, letterSpacing: 0.8, opacity: 0.7, textTransform: 'uppercase' },
-  loadingCard: { borderRadius: Spacing.four, padding: Spacing.four, alignItems: 'center' },
-  emptyCard: { borderRadius: Spacing.four, padding: Spacing.four, alignItems: 'center' },
-  heroCard: { borderRadius: Spacing.four, padding: Spacing.four, gap: Spacing.three },
-  heroBadgeRow: { flexDirection: 'row' },
-  liveBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
-  liveDot: { width: 7, height: 7, borderRadius: 3.5 },
-  heroTitle: { lineHeight: 38 },
-  heroMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: Spacing.one },
-  timePill: { paddingHorizontal: Spacing.three, paddingVertical: Spacing.one, borderRadius: Spacing.two },
-  joinBtn: { paddingHorizontal: Spacing.three, paddingVertical: Spacing.two - 2, borderRadius: Spacing.two, alignItems: 'center' },
-  joinBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
-  upcomingList: { gap: Spacing.two },
-  upcomingRow: { flexDirection: 'row', alignItems: 'center', padding: Spacing.three, borderRadius: Spacing.three, gap: Spacing.three },
-  upcomingDot: { width: 10, height: 10, borderRadius: 5, flexShrink: 0 },
-  upcomingBody: { flex: 1, gap: Spacing.half },
+  bellBadgeText: {color: '#fff', fontSize: 10, fontWeight: '700'},
+  sectionTitle: {fontSize: 12, letterSpacing: 0.8, opacity: 0.7, textTransform: 'uppercase'},
+  loadingCard: {borderRadius: Spacing.four, padding: Spacing.four, alignItems: 'center'},
+  emptyCard: {borderRadius: Spacing.four, padding: Spacing.four, alignItems: 'center'},
+  heroCard: {borderRadius: Spacing.four, padding: Spacing.four, gap: Spacing.three},
+  heroBadgeRow: {flexDirection: 'row'},
+  liveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10
+  },
+  liveDot: {width: 7, height: 7, borderRadius: 3.5},
+  heroTitle: {lineHeight: 38},
+  heroMeta: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: Spacing.one},
+  timePill: {paddingHorizontal: Spacing.three, paddingVertical: Spacing.one, borderRadius: Spacing.two},
+  joinBtn: {
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two - 2,
+    borderRadius: Spacing.two,
+    alignItems: 'center'
+  },
+  joinBtnText: {color: '#fff', fontSize: 13, fontWeight: '700'},
+  upcomingList: {gap: Spacing.two},
+  upcomingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: Spacing.three,
+    borderRadius: Spacing.three,
+    gap: Spacing.three
+  },
+  upcomingDot: {width: 10, height: 10, borderRadius: 5, flexShrink: 0},
+  upcomingBody: {flex: 1, gap: Spacing.half},
   noBatchCard: {
     borderRadius: Spacing.four,
     padding: Spacing.six,
