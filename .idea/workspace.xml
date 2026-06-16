@@ -7,13 +7,55 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="33fa88d5-a9f8-4368-b0fc-958f501ee660" name="Changes" comment="">
+    <list default="true" id="33fa88d5-a9f8-4368-b0fc-958f501ee660" name="Changes" comment="refactor: Remove core application screens&#10;&#10;- Deleted `src/app/index.tsx`, `src/app/profile.tsx`, and `src/app/schedule.tsx`.">
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/.claude/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/.claude/worktrees/api-reference-docs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/.dockerignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/compose.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/public/app.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/cache/redis.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/migrations/0002_romantic_iron_lad.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/migrations/0003_special_lester.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/migrations/meta/0002_snapshot.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/migrations/meta/0003_snapshot.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/styles/app.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/utils/cache.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/utils/notifications.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/utils/recurrence.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tscs-calender-server/src/utils/scheduler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/TSCS-App.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TSCS-App.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/markdown.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/markdown.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/_layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/index.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/profile.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/schedule.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/.idea/server-nodejs.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/.idea/server-nodejs.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/biome.json" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/biome.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/drizzle.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/drizzle.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/pnpm-workspace.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/pnpm-workspace.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/db/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/db/migrations/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/migrations/meta/_journal.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/db/repository/batch.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/repository/batch.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/db/repository/event.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/repository/event.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/db/repository/student.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/repository/student.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/db/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/db/schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/routes/event.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/routes/event.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/routes/student.route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/routes/student.route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/auth.ui.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/auth.ui.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/batches.ui.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/batches.ui.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/events.ui.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/events.ui.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/layouts/layout.ui.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/layouts/layout.ui.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/lookup.ui.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/lookup.ui.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/students.ui.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/routes/ui/students.ui.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/schemas/event/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/schemas/event/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/schemas/response.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/schemas/response.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/schemas/student/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/schemas/student/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/utils/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../tscs-calender-server/src/utils/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../tscs-calender-server/src/utils/fetch.ts" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,17 +74,25 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="94" />
+    <option name="cachedIndexableFilesCount" value="157" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
   <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="false" />
     <option name="myAllFileTypesSelected" value="true" />
     <option name="mySelectedFileTypes">
       <set />
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../tscs-calender-server" />
   </component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
@@ -54,61 +104,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="6.4865846778145436E-80" />
-      <entry key="S2" value="1.085702398996216E-19" />
-      <entry key="S5" value="1.894742722405231E-7" />
-      <entry key="S10" value="0.0027088645391647333" />
-      <entry key="S30" value="1.8851748258105443" />
-      <entry key="S60" value="10.105552946483181" />
-      <entry key="M2" value="24.66092406658221" />
-      <entry key="M5" value="50.98384148750649" />
-      <entry key="M10" value="73.1873046333134" />
-      <entry key="M15" value="84.66622760895608" />
-      <entry key="M30" value="101.17964427351279" />
-      <entry key="H1" value="117.86337677734164" />
-      <entry key="H2" value="152.5228041778711" />
-      <entry key="H4" value="218.0387585081882" />
-      <entry key="D1" value="382.0049835624023" />
-      <entry key="W1" value="435.7695848669806" />
+      <entry key="MS100" value="1.0000000000520972" />
+      <entry key="MS500" value="1.0087773429924347" />
+      <entry key="S2" value="1.3060842805633193" />
+      <entry key="S5" value="1.625884758769538" />
+      <entry key="S10" value="1.88389945387588" />
+      <entry key="S30" value="3.304107948781959" />
+      <entry key="S60" value="5.997678486704506" />
+      <entry key="M2" value="12.8307156242991" />
+      <entry key="M5" value="31.420760532100633" />
+      <entry key="M10" value="54.29821289853568" />
+      <entry key="M15" value="74.11678590346227" />
+      <entry key="M30" value="128.0621541485109" />
+      <entry key="H1" value="207.08182329901592" />
+      <entry key="H2" value="299.46556896404195" />
+      <entry key="H4" value="406.6235502682503" />
+      <entry key="D1" value="637.2661220485857" />
+      <entry key="W1" value="711.7932934504067" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0000000000000058" />
-      <entry key="S5" value="1.00000202422347" />
-      <entry key="S10" value="1.0014227520763466" />
-      <entry key="S30" value="1.1125352707154348" />
-      <entry key="S60" value="1.343344040318566" />
-      <entry key="M2" value="1.668418644642364" />
-      <entry key="M5" value="2.1842400860973896" />
-      <entry key="M10" value="2.526759492681229" />
-      <entry key="M15" value="2.7788456783251894" />
-      <entry key="M30" value="3.9811521915937105" />
-      <entry key="H1" value="6.490521997213538" />
-      <entry key="H2" value="9.317864002197554" />
-      <entry key="H4" value="11.638177597889962" />
-      <entry key="D1" value="14.927564632742344" />
-      <entry key="W1" value="15.831040127399918" />
+      <entry key="MS100" value="1.0045845293647228E-242" />
+      <entry key="MS500" value="3.984715298012161E-49" />
+      <entry key="S2" value="7.945099839828997E-13" />
+      <entry key="S5" value="1.4482115561383377E-5" />
+      <entry key="S10" value="0.004021726826451589" />
+      <entry key="S30" value="0.2546887742571264" />
+      <entry key="S60" value="0.925783631124571" />
+      <entry key="M2" value="2.178599074248697" />
+      <entry key="M5" value="4.707567249042524" />
+      <entry key="M10" value="7.2592228665439" />
+      <entry key="M15" value="8.95749128393945" />
+      <entry key="M30" value="12.430279890527736" />
+      <entry key="H1" value="17.296602362668207" />
+      <entry key="H2" value="23.162590571315043" />
+      <entry key="H4" value="28.460520419414006" />
+      <entry key="D1" value="35.81198408588265" />
+      <entry key="W1" value="37.66235653667079" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="3.510237314700606E-6" />
-      <entry key="MS500" value="0.08110867293369894" />
-      <entry key="S2" value="0.5336626690199828" />
-      <entry key="S5" value="0.7778711775075489" />
-      <entry key="S10" value="0.8858989912582169" />
-      <entry key="S30" value="2.9490040828828765" />
-      <entry key="S60" value="11.413510921882722" />
-      <entry key="M2" value="26.302764632608252" />
-      <entry key="M5" value="53.1500716746671" />
-      <entry key="M10" value="75.70125519666048" />
-      <entry key="M15" value="87.43466803266591" />
-      <entry key="M30" value="105.15236149067432" />
-      <entry key="H1" value="124.34649202539681" />
-      <entry key="H2" value="161.8345821823322" />
-      <entry key="H4" value="229.67232894865367" />
-      <entry key="D1" value="396.931185749885" />
-      <entry key="W1" value="451.60040164492216" />
+      <entry key="MS100" value="0.03955489356161116" />
+      <entry key="MS500" value="0.5262216453725789" />
+      <entry key="S2" value="1.0646884866267428" />
+      <entry key="S5" value="1.4795738319475056" />
+      <entry key="S10" value="1.790724078798724" />
+      <entry key="S30" value="3.4332637606580017" />
+      <entry key="S60" value="6.754207192070072" />
+      <entry key="M2" value="14.804586128420514" />
+      <entry key="M5" value="35.92824080073178" />
+      <entry key="M10" value="61.386062124876965" />
+      <entry key="M15" value="82.92035377007237" />
+      <entry key="M30" value="140.37251000485358" />
+      <entry key="H1" value="224.29588665299707" />
+      <entry key="H2" value="322.57700193433806" />
+      <entry key="H4" value="435.0543865473503" />
+      <entry key="D1" value="673.0720586236424" />
+      <entry key="W1" value="749.4547397326038" />
     </decayedShown>
   </component>
   <component name="OptimizeOnSaveOptions">
@@ -119,44 +169,50 @@
   &quot;fromUser&quot;: false
 }</component>
   <component name="ProjectId" id="3ERO3J4ktP7u0NgzPRaLGvLHEeN" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;24.13.0&quot;,
-    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;24.13.0&quot;,
-    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/TSCS-App&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
-    &quot;npm.android.executor&quot;: &quot;Run&quot;,
-    &quot;npm.start.executor&quot;: &quot;Run&quot;,
-    &quot;npm.web.executor&quot;: &quot;Run&quot;,
-    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AcpAgentsConfigurable&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;E:\\TSCS-App\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Docker.tscs-calender-server/compose.yaml.dragonfly: Compose Deployment.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.nodejs.core.library.configured.version": "24.13.0",
+    "javascript.nodejs.core.library.typings.version": "24.13.2",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "E:/TSCS-App",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "npm.android.executor": "Run",
+    "npm.start.executor": "Run",
+    "npm.tscs-calender-server > dev.executor": "Run",
+    "npm.tscs-calender-server > dev:css.executor": "Run",
+    "npm.web.executor": "Run",
+    "rearrange.code.on.save": "true",
+    "settings.editor.selected.configurable": "settings.typescriptcompiler",
+    "show.migrate.to.gradle.popup": "false",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "C:\\Users\\borah\\AppData\\Local\\JetBrains\\WebStorm2026.1\\ts-go-fork-embedded\\0.0.14",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="ReactDesignerToolWindowState">
     <option name="myId2Visible">
       <map>
@@ -175,7 +231,26 @@
       <recent name="E:\TSCS-App\.claude" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.android">
+  <component name="RunManager" selected="Docker.tscs-calender-server/compose.yaml.dragonfly: Compose Deployment">
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="tscs-calender-server/compose.yaml.dragonfly: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="dragonfly" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="../tscs-calender-server/compose.yaml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
     <configuration name="android" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -196,11 +271,21 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="web" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/package.json" />
+    <configuration name="tscs-calender-server &gt; dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/../tscs-calender-server/package.json" />
       <command value="run" />
       <scripts>
-        <script value="web" />
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="tscs-calender-server &gt; dev:css" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/../tscs-calender-server/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev:css" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
@@ -208,16 +293,18 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.tscs-calender-server/compose.yaml.dragonfly: Compose Deployment" />
+        <item itemvalue="npm.tscs-calender-server &gt; dev" />
+        <item itemvalue="npm.tscs-calender-server &gt; dev:css" />
         <item itemvalue="npm.android" />
         <item itemvalue="npm.start" />
-        <item itemvalue="npm.web" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-6f3a0af6a84c-JavaScript-WS-262.7132.27" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-WS-261.25134.101" />
       </set>
     </attachedChunks>
   </component>
@@ -247,6 +334,11 @@
       <workItem from="1780907562586" duration="7413000" />
       <workItem from="1780997047324" duration="4156000" />
       <workItem from="1781090026283" duration="7025000" />
+      <workItem from="1781261778811" duration="3137000" />
+      <workItem from="1781544441927" duration="2915000" />
+      <workItem from="1781612342465" duration="15000" />
+      <workItem from="1781613004944" duration="4014000" />
+      <workItem from="1781626836220" duration="9447000" />
     </task>
     <task id="LOCAL-00001" summary="feat: add cross-platform EventDrawer component for event details&#10;&#10;- Implemented a reusable `EventDrawer` component with platform-specific versions for native and web.&#10;- Integrated the drawer into the Schedule screen, replacing the previous modal-based implementation.&#10;- Added event handling features, including &quot;Join Live Class&quot; and &quot;Add to Calendar&quot; actions with platform-optimized behavior.&#10;- Updated `event-utils` with shared event-related logic and platform-specific calendar integration.&#10;- Replaced redundant logic in Schedule and Home screens with newly extracted helpers from `event-utils`. &#10;- Installed `vaul` package as a dependency for the web drawer implementation.">
       <option name="closed" value="true" />
@@ -272,7 +364,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781091833801</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="refactor: Remove core application screens&#10;&#10;- Deleted `src/app/index.tsx`, `src/app/profile.tsx`, and `src/app/schedule.tsx`.">
+      <option name="closed" value="true" />
+      <created>1781264307737</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1781264307737</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -283,6 +383,21 @@
     <MESSAGE value="feat: add cross-platform EventDrawer component for event details&#10;&#10;- Implemented a reusable `EventDrawer` component with platform-specific versions for native and web.&#10;- Integrated the drawer into the Schedule screen, replacing the previous modal-based implementation.&#10;- Added event handling features, including &quot;Join Live Class&quot; and &quot;Add to Calendar&quot; actions with platform-optimized behavior.&#10;- Updated `event-utils` with shared event-related logic and platform-specific calendar integration.&#10;- Replaced redundant logic in Schedule and Home screens with newly extracted helpers from `event-utils`. &#10;- Installed `vaul` package as a dependency for the web drawer implementation." />
     <MESSAGE value="feat: implement student authentication and IDE setup&#10;&#10;- Added a dedicated login screen (`AuthScreen`) for student authentication.&#10;- Integrated a Zustand store for persistent management of student authentication state.&#10;- Enhanced `useWeekEvents` to fetch events specific to an authenticated student's batch.&#10;- Included IDE configuration files for Biome, Git Toolbox, JavaScript, Markdown, SQL, and Tailwind CSS.&#10;- Removed the outdated API reference document.&#10;- Updated ESLint configuration to ignore `dist/` directory." />
     <MESSAGE value="refactor: Streamline UI and update dependencies&#10;&#10;- Removed the &quot;Material&quot; tab from the application navigation.&#10;- Simplified the Profile screen by removing the statistics section and &quot;Downloads&quot; setting.&#10;- Updated various Expo and UI-related dependencies to their latest versions.&#10;- Adjusted the local API base URL in `src/lib/api.ts`." />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: Streamline UI and update dependencies&#10;&#10;- Removed the &quot;Material&quot; tab from the application navigation.&#10;- Simplified the Profile screen by removing the statistics section and &quot;Downloads&quot; setting.&#10;- Updated various Expo and UI-related dependencies to their latest versions.&#10;- Adjusted the local API base URL in `src/lib/api.ts`." />
+    <MESSAGE value="refactor: Remove deprecated core application screens&#10;&#10;- Deleted `src/app/index.tsx`, `src/app/profile.tsx`, and `src/app/schedule.tsx`." />
+    <MESSAGE value="refactor: Remove Home, Profile, and Schedule screens" />
+    <MESSAGE value="refactor: Remove core application screens&#10;&#10;- Deleted `src/app/index.tsx`, `src/app/profile.tsx`, and `src/app/schedule.tsx`." />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: Remove core application screens&#10;&#10;- Deleted `src/app/index.tsx`, `src/app/profile.tsx`, and `src/app/schedule.tsx`." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/../tscs-calender-server/src/utils/cache.ts</url>
+          <line>17</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -3,6 +3,6 @@
   <component name="MarkdownSettings">
     <option name="autoScrollEnabled" value="false" />
     <option name="fileGroupingEnabled" value="true" />
-    <option name="splitLayout" value="SHOW_EDITOR" />
+    <option name="splitLayout" value="SHOW_PREVIEW" />
   </component>
 </project>

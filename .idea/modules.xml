@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/TSCS-App.iml" filepath="$PROJECT_DIR$/.idea/TSCS-App.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tscs-calender-server/.idea/server-nodejs.iml" filepath="$PROJECT_DIR$/../tscs-calender-server/.idea/server-nodejs.iml" />
     </modules>
   </component>
 </project>
